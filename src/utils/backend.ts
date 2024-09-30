@@ -4,32 +4,27 @@ import { Backend } from 'decky-plugin-framework';
  * The Backend class provides access to plugin Python backend methods
  */
 export class BackendUtils {
-  /**
-   * Private constructor to prevent instantiation
-   */
-  private constructor() {}
-
-  /**
-   * Method to get the plugin log
-   * @returns A Promise of the log as a string
-   */
-  public static async getPluginLog(): Promise<string> {
-    return Backend.backend_call<[], string>('get_plugin_log');
+  public static async configure(): Promise<string> {
+    return Backend.backend_call<[], string>('configure');
   }
 
-  /**
-   * Method to get the plugin log
-   * @returns A Promise of the log as a string
-   */
-  public static async getPluginName(): Promise<string> {
-    return Backend.backend_call<[], string>('get_plugin_name');
+  public static async get_backend_type(): Promise<string> {
+    return Backend.backend_call<[], string>('get_backend_type');
   }
 
-  /**
-   * Method to get the plugin log
-   * @returns A Promise of the log as a string
-   */
-  public static async add(left: number, right: number): Promise<number> {
-    return Backend.backend_call<[left: number, right: number], number>('add', left, right);
+  public static async rclone_sync(winner: string, resync: boolean): Promise<number> {
+    return Backend.backend_call<[winner: string, resync: boolean], number>(
+      'rclone_sync',
+      winner,
+      resync
+    );
+  }
+
+  public static async fs_sync(local_to_remote: boolean): Promise<void> {
+    return Backend.backend_call<[local_to_remote: boolean], void>('fs_sync', local_to_remote);
+  }
+
+  public static async send_signal(pid: number, signal: string): Promise<void> {
+    return Backend.backend_call<[pid: number, signal: string], void>('send_signal', pid, signal);
   }
 }

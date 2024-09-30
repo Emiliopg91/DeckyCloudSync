@@ -54,7 +54,13 @@
   "dependencies": {
     "react-icons": "^4.12.0"
   },
-  "remote_binary": [],
+  "remote_binary": [
+    {
+      "url": "https://downloads.rclone.org/v1.68.1/rclone-v1.68.1-linux-amd64.zip",
+      "sha256hash": "34f34743b1831523cd2e0aff74447b717e2d62fe1b598e91703899e0c0689568",
+      "name": "backend/rclone.zip"
+    }
+  ],
   "pnpm": {
     "peerDependencyRules": {
       "ignoreMissing": [

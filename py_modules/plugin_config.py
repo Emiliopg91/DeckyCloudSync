@@ -138,7 +138,8 @@ def migrate():
     if not cfg_property_file.is_file():
         cfg_property_file.touch()
         dictionary = {
-            "log_level": "INFO"
+            "log_level": "INFO",
+            "entries": []
         }
         json_object = json.dumps(dictionary, indent=4)
         with open(cfg_property_file, "w") as outfile:
