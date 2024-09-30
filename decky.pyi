@@ -172,3 +172,12 @@ Logging
 
 logger: logging.Logger
 """The main plugin logger writing to `DECKY_PLUGIN_LOG`."""
+
+"""
+Event handling
+"""
+# TODO better docstring im lazy
+async def emit(event: str, *args: Any) -> None:
+    """
+    Send an event to the frontend.
+    """

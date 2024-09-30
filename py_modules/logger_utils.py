@@ -32,7 +32,7 @@ def get_plugin_log() -> str:
     str: The plugin log.
     """
     log: str = ""
-    for line in reversed(list(open(decky.DECKY_LOG))):
+    for line in reversed(list(open(decky.DECKY_PLUGIN_LOG))):
         log = line + '\n' + log  
         if "Logger initialized at level" in line.strip():
             break

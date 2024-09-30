@@ -6,11 +6,12 @@ import os
 import decky
 import plugin_config
 import logger_utils
+import signal
+from utils.rclone import RCloneManager
+from utils.processes import Processes
+from utils.fs_sync import FsSync
 
 class Plugin:
-    # A normal method. It can be called from JavaScript using call_plugin_function("method_1", argument1, argument2)
-    async def add(self, left, right):
-        return left + right
     
 # Configuration
     async def get_config(self):
@@ -43,3 +44,34 @@ class Plugin:
     async def _migration(self):
         decky.logger.info("Migrating plugin configuration")
         plugin_config.migrate()
+
+# Setup
+
+    async def configure(self):
+        decky.logger.info("Executing: configure()")
+        return await RCloneManager.configure()
+
+    async def get_backend_type(self):
+        decky.logger.debug(
+            "Executing: RcloneSetupManager.get_backend_type()")
+        return RCloneManager.get_backend_type()
+
+# Sync
+
+    async def rclone_sync(self, winner: str, resync: bool) :
+        decky.logger.debug(f"Executing: rclone_sync({winner}, {resync})")
+        return RCloneManager.sync(winner,resync)
+    
+    async def fs_sync(self, local_to_remote:bool):
+        decky.logger.debug(f"Executing: fs_sync({local_to_remote})")
+        if(local_to_remote):
+            FsSync.copyToRemote()
+        else:
+            FsSync.copyFromRemote()
+        
+    
+# Processes
+
+    async def send_signal(self, pid: int, s: str):
+        decky.logger.debug(f"Executing: send_signal({pid}, {s})")
+        return Processes.send_signal(pid, s)
