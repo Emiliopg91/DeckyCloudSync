@@ -1,7 +1,7 @@
 {
-  "name": "Decky-Plugin-Template",
+  "name": "DeckyCloudSync",
   "author": "Emiliopg91",
-  "flags": ["debug"],
+  "flags": [],
   "publish": {
     "tags": ["template"],
     "description": "Template for Decky plugins.",

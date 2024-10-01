@@ -2,6 +2,7 @@ import subprocess
 import asyncio
 from asyncio.subprocess import Process, create_subprocess_exec
 import decky
+import contextlib
 import logger_utils
 import plugin_config
 import fs_sync
@@ -22,21 +23,24 @@ class RCloneManager:
                 "(http:\/\/127\.0\.0\.1:53682\/auth\?state=.*)\\n$", line)
             if url_re_match:
                 return url_re_match.group(1)
+            
+    @staticmethod
+    async def wait_for(process: asyncio.subprocess.Process, backend_type:str):
+        with contextlib.suppress(asyncio.TimeoutError):
+            await asyncio.wait_for(process.wait(), 1e-6)
+        decky.emit("rcloneConfigFinished", process.returncode, backend_type)        
 
     @staticmethod
-    async def configure():
+    async def configure(backend_type:str):
         logger_utils.log("INFO", "Updating rclone.conf")
 
         current_spawn = await create_subprocess_exec(Constants.rclone_bin, *(["--config", Constants.rclone_settings, "config", "create", "backend", backend_type]), stderr=asyncio.subprocess.PIPE)
+        RCloneManager.wait_for(current_spawn, backend_type)
 
         url = await RCloneManager._get_url_from_rclone_process(current_spawn)
         logger_utils.log("INFO", "Login URL: %s", url)
 
         return url
-    
-    @staticmethod
-    def get_backend_type():
-        return plugin_config.get_config_item("settings.remote.type")
 
     @staticmethod
     def sync(winner: str, resync: bool) -> int:

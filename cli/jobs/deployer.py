@@ -26,7 +26,7 @@ class Deployer:
 
     def _get_deck_password(self):
         while True:
-            self.deck_pass = getpass.getpass(f"  Enter password for {self.deck_user}: ")
+            self.deck_pass = getpass.getpass(f"  Enter password for {self.deck_user}@{self.deck_ip}: ")
             if self.deck_pass:
                 break
             print("    Password cannot be empty. Please try again.")
@@ -57,7 +57,7 @@ class Deployer:
         print("  Deploying plugin")
         Utils.run_command([
             "rsync", "-azp", "--delete", "--chmod=D0755,F0755",
-            self.output_root + "/" + self.plugin_name, f"{self.deck_user}@{self.deck_ip}:{self.deck_dir}/homebrew/plugins" + self.plugin_name
+            self.output_root + "/" + self.plugin_name, f"{self.deck_user}@{self.deck_ip}:{self.deck_dir}/homebrew/plugins"
         ], False, self.log_deploying)
 
     def _restart_decky(self):

@@ -45,18 +45,11 @@ class Plugin:
         decky.logger.info("Migrating plugin configuration")
         plugin_config.migrate()
 
-# Setup
+# RClone
 
-    async def configure(self):
-        decky.logger.info("Executing: configure()")
-        return await RCloneManager.configure()
-
-    async def get_backend_type(self):
-        decky.logger.debug(
-            "Executing: RcloneSetupManager.get_backend_type()")
-        return RCloneManager.get_backend_type()
-
-# Sync
+    async def configure(self, backend_type:str):
+        decky.logger.info(f"Executing: configure({backend_type})")
+        return await RCloneManager.configure(backend_type)
 
     async def rclone_sync(self, winner: str, resync: bool) :
         decky.logger.debug(f"Executing: rclone_sync({winner}, {resync})")

@@ -1,4 +1,4 @@
-export enum Winners {
-  path1,
-  path2
+export enum Winner {
+  LOCAL = 'path1',
+  REMOTE = 'path2'
 }

@@ -1,7 +1,5 @@
-import { FC, ImgHTMLAttributes } from 'react';
+import { FC } from 'react';
+import { IconBaseProps } from 'react-icons';
+import { FaSave } from 'react-icons/fa';
 
-import icon from '../../../assets/logo.png';
-
-export const PluginIcon: FC<ImgHTMLAttributes<HTMLImageElement>> = (props) => (
-  <img src={icon} alt="logo" {...props} />
-);
+export const PluginIcon: FC<IconBaseProps> = (props) => <FaSave color="cyan" {...props} />;
