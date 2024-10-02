@@ -22,14 +22,14 @@ export class PluginSettings {
     }
   }
 
-  public static getBackendType(): string | undefined {
-    return PluginSettings.settings.settings?.remote?.type || undefined;
+  public static getProvider(): string | undefined {
+    return PluginSettings.settings.settings?.remote?.provider || undefined;
   }
 
-  public static setProfilePerGame(value: string): void {
+  public static setProvider(value: string): void {
     if (!PluginSettings.settings.settings?.remote) {
       PluginSettings.createParents(PluginSettings.settings, 'settings.remote');
     }
-    PluginSettings.settings.settings!.remote.type = value;
+    PluginSettings.settings.settings!.remote.provider = value;
   }
 }

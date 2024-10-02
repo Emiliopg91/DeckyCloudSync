@@ -7,6 +7,6 @@ export interface Settings {
 }
 
 export interface Remote {
-  type: string;
+  provider: string;
   directory: string;
 }

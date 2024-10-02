@@ -2,6 +2,7 @@
   "name": "DeckyCloudSync",
   "author": "Emiliopg91",
   "flags": [],
+  "api_version": 1,
   "publish": {
     "tags": ["template"],
     "description": "Template for Decky plugins.",

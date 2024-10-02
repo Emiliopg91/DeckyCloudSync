@@ -39,8 +39,8 @@ export class WhiteBoardUtil {
     }).unsubscribe;
   }
 
-  public static getLog(): string | undefined {
-    return WhiteBoard.get('log') || undefined;
+  public static getLog(): string {
+    return WhiteBoard.get<string>('log')?.replace(/\n{2,}/g, '\n') || '';
   }
   public static setLog(value: string): void {
     WhiteBoard.set('log', value);

@@ -14,28 +14,28 @@ export const LogsBlock: FC = () => {
 
   return (
     <>
-      {!provider && (
-        <>
-          <PanelSection title={Translator.translate('logs')}>
-            <PanelSectionRow>
-              <ButtonWithIcon
-                layout="below"
-                onClick={() => {
-                  (async (): Promise<void> => {
-                    let logs = await BackendUtils.getPluginLog();
-                    if (!logs || logs == '') {
-                      logs = Translator.translate('no.available.logs');
-                    }
-                    WhiteBoardUtil.setLog(logs);
-                    Navigation.Navigate(Constants.PATH_PLUGIN_LOG);
-                    Navigation.CloseSideMenus();
-                  })();
-                }}
-                icon={<FaPlug />}
-              >
-                {Translator.translate('app.logs')}
-              </ButtonWithIcon>
-            </PanelSectionRow>
+      <>
+        <PanelSection title={Translator.translate('logs')}>
+          <PanelSectionRow>
+            <ButtonWithIcon
+              layout="below"
+              onClick={() => {
+                (async (): Promise<void> => {
+                  let logs = await BackendUtils.getPluginLog();
+                  if (!logs || logs == '') {
+                    logs = Translator.translate('no.available.logs');
+                  }
+                  WhiteBoardUtil.setLog(logs);
+                  Navigation.Navigate(Constants.PATH_PLUGIN_LOG);
+                  Navigation.CloseSideMenus();
+                })();
+              }}
+              icon={<FaPlug />}
+            >
+              {Translator.translate('app.logs')}
+            </ButtonWithIcon>
+          </PanelSectionRow>
+          {provider && (
             <PanelSectionRow>
               <ButtonWithIcon
                 layout="below"
@@ -56,9 +56,9 @@ export const LogsBlock: FC = () => {
                 {Translator.translate('sync.logs')}
               </ButtonWithIcon>
             </PanelSectionRow>
-          </PanelSection>
-        </>
-      )}
+          )}
+        </PanelSection>
+      </>
     </>
   );
 };

@@ -1,23 +1,27 @@
-import { Backend, Translator } from 'decky-plugin-framework';
+import { Backend, Logger, Translator } from 'decky-plugin-framework';
 
 import { Signal } from '../models/signals';
 import { Winner } from '../models/winners';
 import { Toast } from './toast';
+import { WhiteBoardUtil } from './whiteboard';
 
 /**
  * The Backend class provides access to plugin Python backend methods
  */
 export class BackendUtils {
+  static getConfigUrl(): Promise<string> {
+    return Backend.backend_call<[], string>('get_config_url');
+  }
   public static async getPluginLog(): Promise<string> {
-    return '';
+    return Backend.backend_call<[], string>('get_plugin_log');
   }
 
   public static async getSyncLog(): Promise<string> {
-    return '';
+    return Backend.backend_call<[], string>('get_last_sync_log');
   }
 
-  public static async configure(backend_type: string): Promise<string> {
-    return Backend.backend_call<[backend_type: string], string>('configure', backend_type);
+  public static async configure(backend_type: string): Promise<number> {
+    return Backend.backend_call<[backend_type: string], number>('configure', backend_type);
   }
 
   public static async rcloneSync(winner: Winner, resync: boolean): Promise<number> {
@@ -37,17 +41,26 @@ export class BackendUtils {
   }
 
   public static async doSynchronization(winner: Winner, resync: boolean): Promise<void> {
-    await BackendUtils.fsSync(true);
-    const returnCode = await BackendUtils.rcloneSync(winner, resync);
+    Logger.info('=== STARTING SYNC ===');
+    WhiteBoardUtil.setSyncInProgress(true);
+    try {
+      await BackendUtils.fsSync(true);
+      const returnCode = await BackendUtils.rcloneSync(winner, resync);
 
-    if (returnCode != 0) {
-      //TODO: action for opening log
-      Toast.toast(Translator.translate('sync.failed'));
-      return;
-    }
+      if (returnCode != 0) {
+        //TODO: action for opening log
+        Toast.toast(Translator.translate('sync.failed'));
+        WhiteBoardUtil.setSyncInProgress(false);
+        Logger.info('=== FINISHING SYNC ===');
+        return;
+      }
 
-    await BackendUtils.fsSync(false);
-    Toast.toast(Translator.translate('sync.succesful'));
+      await BackendUtils.fsSync(false);
+      Toast.toast(Translator.translate('sync.succesful'));
+      // eslint-disable-next-line no-empty
+    } catch (e) {}
+    Logger.info('=== FINISHING SYNC ===');
+    WhiteBoardUtil.setSyncInProgress(false);
   }
 
   public static async doSynchronizationForGame(onStart: boolean, pid: number): Promise<void> {
