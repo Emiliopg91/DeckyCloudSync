@@ -40,7 +40,7 @@ class Processes:
         """
         try:
             if(parent):
-                logger_utils.log("INFO", f"Sending signal {signal} to process PID {pid} and children.", pid, signal)
+                logger_utils.log("INFO", f"Sending signal {signal} to process PID {pid} and children.")
 
             os.kill(pid, signal)
 
@@ -50,4 +50,4 @@ class Processes:
                 Processes.send_signal(child_pid, signal)
                 
         except Exception as e:
-            logger_utils.log("ERROR", "Error sending signal to process: %s", e)
+            logger_utils.log("ERROR", f"Error sending signal to process: {e}")

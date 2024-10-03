@@ -7,6 +7,7 @@ import os
 import shutil
 from jobs.utils import Utils
 from jobs.setup import Setup
+from jobs.translations import TranslationUpdater
 
 class JobManager:
     def __init__(self):
@@ -20,6 +21,10 @@ class JobManager:
         os.chmod(Utils.plugin_dir, 0o777)
         if os.path.exists(self.log_dir):
             shutil.rmtree(self.log_dir)
+
+        if "translations" in options:
+            TranslationUpdater().update_translations()
+            return
 
         if "deploy" in options or "setup" in options:
             Setup().check_settings()

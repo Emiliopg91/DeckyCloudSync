@@ -103,6 +103,34 @@ def set_config(key: str, value):
         json.dump(data, jsonFile, indent=4)
         jsonFile.truncate()
 
+def delete_config(key: str):
+    """
+    Deletes a configuration key from the plugin configuration file.
+
+    Parameters:
+    key (str): The key to delete.
+    """
+    with open(cfg_property_file, "r+") as jsonFile:
+        data = json.load(jsonFile)
+        
+        keys = key.split(".")
+        d = data
+        
+        for k in keys[:-1]:
+            if k not in d:
+                print(f"Key '{key}' does not exist.")
+                return
+            d = d[k]
+        
+        if keys[-1] in d:
+            del d[keys[-1]]
+            print(f"Key '{key}' has been deleted.")
+        else:
+            print(f"Key '{key}' does not exist.")
+
+        jsonFile.seek(0)
+        json.dump(data, jsonFile, indent=4)
+        jsonFile.truncate()
 
 def get_config_item(name: str, default: str = None):
     """

@@ -4,11 +4,11 @@ import {
   EventType,
   GameLifeEventData,
   Logger,
-  Toast,
   Translator
 } from 'decky-plugin-framework';
 
 import { BackendUtils } from './backend';
+import { Toast } from './toast';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare const appStore: any;
@@ -39,7 +39,7 @@ export class SteamListeners {
 
   private static syncGame(e: GameLifeEventData): void {
     if (e.isRunning()) {
-      Toast.toast(Translator.translate('synchronizing.savedata'), 2000);
+      Toast.toast(Translator.translate('synchronizing.savedata'));
     }
     BackendUtils.doSynchronizationForGame(e.isRunning(), e.getPID());
   }

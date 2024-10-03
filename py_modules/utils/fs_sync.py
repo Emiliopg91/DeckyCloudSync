@@ -87,7 +87,7 @@ class FsSync:
                     # We check if any files in the directory match the inclusion criteria before deleting the directory
                     for inclusion_pattern in inclusions:
                         if any(fnmatch.fnmatch(file, inclusion_pattern) for file in os.listdir(dest_dir)):
-                            os.rmdir(dest_dir)
+                            shutil.rmtree(dest_dir)
                             break
 
         # Copy files to the destination

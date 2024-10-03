@@ -12,10 +12,7 @@ export class Toast {
   /**
    * Icon for the toast notification.
    */
-  private static ico = window.SP_REACT.createElement(PluginIcon, {
-    width: 30,
-    height: 30
-  });
+  private static ico = window.SP_REACT.createElement(PluginIcon, { size: 40 });
 
   /**
    * Displays a toast notification.

@@ -24,6 +24,10 @@ class Plugin:
         decky.logger.debug("Executing: set_config(%s, %s)", key, str(value))
         plugin_config.set_config(key, value)
 
+    async def delete_config(self, key: str):
+        decky.logger.debug("Executing: delete_config(%s)", key)
+        plugin_config.delete_config(key)
+
 # Logger
 
     async def log(self, level: str, msg: str) -> int:

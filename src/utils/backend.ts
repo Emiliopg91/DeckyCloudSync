@@ -50,6 +50,7 @@ export class BackendUtils {
 
   public static async doSynchronization(winner: Winner, resync: boolean): Promise<void> {
     Logger.info('=== STARTING SYNC ===');
+    const t0 = Date.now();
     WhiteBoardUtil.setSyncInProgress(true);
     try {
       await BackendUtils.fsSync(true);
@@ -64,9 +65,12 @@ export class BackendUtils {
       }
 
       await BackendUtils.fsSync(false);
-      Toast.toast(Translator.translate('sync.succesful'));
+      Toast.toast(Translator.translate('sync.succesful', { time: (Date.now() - t0) / 1000 }));
       // eslint-disable-next-line no-empty
-    } catch (e) {}
+    } catch (e) {
+      Toast.toast(Translator.translate('sync.failed'));
+      Logger.error('Sync exception', e);
+    }
     Logger.info('=== FINISHING SYNC ===');
     WhiteBoardUtil.setSyncInProgress(false);
   }
@@ -76,7 +80,7 @@ export class BackendUtils {
       await BackendUtils.sendSignal(pid, Signal.SIGSTOP);
     }
 
-    BackendUtils.doSynchronization(onStart ? Winner.REMOTE : Winner.LOCAL, false);
+    await BackendUtils.doSynchronization(onStart ? Winner.REMOTE : Winner.LOCAL, false);
 
     if (onStart) {
       await BackendUtils.sendSignal(pid, Signal.SIGCONT);

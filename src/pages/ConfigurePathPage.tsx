@@ -29,7 +29,7 @@ export const ConfigurePathPage: FC = () => {
         showModal(
           <ConfirmModal
             strTitle={Translator.translate('configuration.error')}
-            strDescription={Translator.translate('remote.misplaced')}
+            strDescription={Translator.translate('remote.misplaced', { remoteDir })}
             strOKButtonText={Translator.translate('try.again')}
             onOK={() => {
               selectRemoteDir();
@@ -40,7 +40,7 @@ export const ConfigurePathPage: FC = () => {
         showModal(
           <ConfirmModal
             strTitle={Translator.translate('configuration.error')}
-            strDescription={Translator.translate('remote.select.subfolder')}
+            strDescription={Translator.translate('remote.select.subfolder', { remoteDir })}
             strOKButtonText={Translator.translate('try.again')}
             onOK={() => {
               selectRemoteDir();
@@ -73,8 +73,7 @@ export const ConfigurePathPage: FC = () => {
           <ConfirmModal
             strTitle={Translator.translate('configuration.error')}
             strDescription={Translator.translate('local.include.remote', {
-              local: res.path,
-              remote: remoteDir
+              remoteDir
             })}
             strOKButtonText={Translator.translate('try.again')}
             onOK={() => {
