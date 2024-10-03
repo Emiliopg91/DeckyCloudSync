@@ -11,6 +11,7 @@ from utils.rclone import RCloneManager
 from utils.processes import Processes
 from utils.fs_sync import FsSync
 from utils.logs import LogManager
+from utils.constants import Constants
 
 class Plugin:
     
@@ -79,3 +80,12 @@ class Plugin:
     async def get_config_url(self) -> str:
         decky.logger.debug("Executing: get_config_url()")
         return LogManager.get_config_url()
+    
+# Misc
+    async def get_home_dir(self) -> str:
+        decky.logger.debug("Executing: get_home_dir()")
+        return decky.HOME
+    
+    async def get_remote_dir(self) -> str:
+        decky.logger.debug("Executing: get_remote_dir()")
+        return Constants.remote_dir

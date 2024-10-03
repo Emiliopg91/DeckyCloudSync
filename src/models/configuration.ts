@@ -1,5 +1,6 @@
 export interface Configuration {
   settings: Settings;
+  entries: Record<string, Path>;
 }
 
 export interface Settings {
@@ -9,4 +10,10 @@ export interface Settings {
 export interface Remote {
   provider: string;
   directory: string;
+}
+
+export interface Path {
+  folder: string;
+  inclusions: Array<string>;
+  exclusions: Array<string>;
 }

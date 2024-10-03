@@ -40,6 +40,14 @@ export class BackendUtils {
     return Backend.backend_call<[pid: number, signal: number], void>('send_signal', pid, signal);
   }
 
+  public static async getHomeDir(): Promise<string> {
+    return Backend.backend_call<[], string>('get_home_dir');
+  }
+
+  public static async getRemoteDir(): Promise<string> {
+    return Backend.backend_call<[], string>('get_remote_dir');
+  }
+
   public static async doSynchronization(winner: Winner, resync: boolean): Promise<void> {
     Logger.info('=== STARTING SYNC ===');
     WhiteBoardUtil.setSyncInProgress(true);

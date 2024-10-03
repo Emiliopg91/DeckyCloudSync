@@ -1,6 +1,6 @@
 import { Settings } from 'decky-plugin-framework';
 
-import { Configuration } from '../models/configuration';
+import { Configuration, Path } from '../models/configuration';
 
 export class PluginSettings {
   public static settings: Configuration;
@@ -31,5 +31,30 @@ export class PluginSettings {
       PluginSettings.createParents(PluginSettings.settings, 'settings.remote');
     }
     PluginSettings.settings.settings!.remote.provider = value;
+  }
+
+  public static getRemoteDirectory(): string | undefined {
+    return PluginSettings.settings.settings?.remote?.directory || 'decky-cloud-sync';
+  }
+
+  public static setRemoteDirectory(value: string): void {
+    if (!PluginSettings.settings.settings?.remote) {
+      PluginSettings.createParents(PluginSettings.settings, 'settings.remote');
+    }
+    PluginSettings.settings.settings!.remote.directory = value;
+  }
+
+  public static getEntries(): Record<string, Path> {
+    const obj = PluginSettings.settings.entries || {};
+    return JSON.parse(JSON.stringify(obj));
+  }
+
+  static saveEntry(key: string, path: Path): void {
+    PluginSettings.settings.entries[key] = path;
+  }
+
+  static removeEntry(key: string): Record<string, Path> {
+    delete PluginSettings.settings.entries[key];
+    return PluginSettings.getEntries();
   }
 }

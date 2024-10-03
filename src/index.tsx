@@ -7,6 +7,8 @@ import translations from '../assets/translations.i18n.json';
 import { PluginIcon } from './components/icons/PluginIcon';
 import { GlobalProvider } from './contexts/globalContext';
 import { ConfigureBackendPage } from './pages/ConfigureBackendPage';
+import { ConfigurePathPage } from './pages/ConfigurePathPage';
+import { ConfigurePathsPage } from './pages/ConfigurePathsPage';
 import { QuickAccessMenuPage } from './pages/QuickAccessMenuPage';
 import { ViewLogsPage } from './pages/ViewLogsPage';
 import { Constants } from './utils/constants';
@@ -21,13 +23,21 @@ export default definePlugin(() => {
     WhiteBoardUtil.setProvider(PluginSettings.settings.settings.remote.provider);
     SteamListeners.bind();
 
-    routerHook.addRoute(Constants.PATH_PLUGIN_LOG, () => <ViewLogsPage forSync={false} />);
-    routerHook.addRoute(Constants.PATH_SYNC_LOG, () => <ViewLogsPage forSync={true} />);
+    routerHook.addRoute(Constants.PATH_PLUGIN_LOG, () => <ViewLogsPage forSync={false} />, {
+      exact: true
+    });
+    routerHook.addRoute(Constants.PATH_SYNC_LOG, () => <ViewLogsPage forSync={true} />, {
+      exact: true
+    });
+    routerHook.addRoute(Constants.PATH_CONFIGURE_PATHS, () => <ConfigurePathsPage />, {
+      exact: true
+    });
+    routerHook.addRoute(Constants.PATH_CONFIGURE_SPECIFIC_PATH, () => <ConfigurePathPage />, {
+      exact: false
+    });
     routerHook.addRoute(Constants.PATH_CONFIGURE_PROVIDER, () => <ConfigureBackendPage />, {
       exact: true
     });
-    //TODO: declare routes
-    //routerHook.addRoute(Constants.PATH_CONFIGURE_PATHS,?);
   })();
 
   return {

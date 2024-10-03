@@ -25,11 +25,11 @@
   },
   "homepage": "https://github.com/Emiliopg91/decky-plugin-template#readme",
   "devDependencies": {
-    "@electron-toolkit/eslint-config-prettier": "^2.0.0",
-    "@electron-toolkit/eslint-config-ts": "^2.0.0",
     "@decky/api": "^1.1.2",
     "@decky/rollup": "^1.0.1",
     "@decky/ui": "^4.7.2",
+    "@electron-toolkit/eslint-config-prettier": "^2.0.0",
+    "@electron-toolkit/eslint-config-ts": "^2.0.0",
     "@rollup/plugin-commonjs": "^21.1.0",
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^13.3.0",
@@ -52,6 +52,7 @@
     "typescript": "^5.6.2"
   },
   "dependencies": {
+    "lodash": "^4.17.21",
     "react-icons": "^4.12.0"
   },
   "remote_binary": [

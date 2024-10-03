@@ -206,3 +206,16 @@ class FsSync:
         decky.logger.info("")
         decky.logger.info(f"Created: {created_files}, Modified: {modified_files}, Deleted: {deleted_files}")
         decky.logger.info(f"Copied: {FsSync.format_size(total_size)} in {display_time} seconds ({FsSync.format_speed(speed)})")
+
+    def simulate_for_entry(entry:dict):
+        # Process inclusions
+        files_to_copy = set()
+        for inclusion_pattern in entry["inclusions"]:
+            matched_files = FsSync.find_files(entry["folder"], inclusion_pattern)
+            files_to_copy.update(matched_files)
+
+        # Filter files to copy, excluding the necessary ones
+        files_to_copy = {file for file in files_to_copy if os.path.basename(file) not in entry["exclusions"]}
+
+        return files_to_copy
+    

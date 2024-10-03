@@ -6,6 +6,8 @@ import {
   WhiteBoardEventData
 } from 'decky-plugin-framework';
 
+import { Path } from '../models/configuration';
+
 export class WhiteBoardUtil {
   public static getSyncInProgress(): boolean {
     return WhiteBoard.get('syncInProgress') || false;
@@ -42,7 +44,16 @@ export class WhiteBoardUtil {
   public static getLog(): string {
     return WhiteBoard.get<string>('log')?.replace(/\n{2,}/g, '\n') || '';
   }
+
   public static setLog(value: string): void {
     WhiteBoard.set('log', value);
+  }
+
+  public static getPathToEdit(): { name: string; path: Path } | undefined {
+    return WhiteBoard.get('pathToEdit') || undefined;
+  }
+
+  public static setPathToEdit(value: { name: string; path: Path } | undefined): void {
+    WhiteBoard.set('pathToEdit', value);
   }
 }
