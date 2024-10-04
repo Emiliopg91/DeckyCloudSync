@@ -1,3 +1,4 @@
+import { Mutex } from 'async-mutex';
 import { Backend, Logger, Translator } from 'decky-plugin-framework';
 
 import { Signal } from '../models/signals';
@@ -9,7 +10,9 @@ import { WhiteBoardUtil } from './whiteboard';
  * The Backend class provides access to plugin Python backend methods
  */
 export class BackendUtils {
-  static getConfigUrl(): Promise<string> {
+  private static SYNC_MUTEX: Mutex = new Mutex();
+
+  public static getConfigUrl(): Promise<string> {
     return Backend.backend_call<[], string>('get_config_url');
   }
   public static async getPluginLog(): Promise<string> {
@@ -49,30 +52,41 @@ export class BackendUtils {
   }
 
   public static async doSynchronization(winner: Winner, resync: boolean): Promise<void> {
-    Logger.info('=== STARTING SYNC ===');
-    const t0 = Date.now();
-    WhiteBoardUtil.setSyncInProgress(true);
-    try {
-      await BackendUtils.fsSync(true);
-      const returnCode = await BackendUtils.rcloneSync(winner, resync);
-
-      if (returnCode != 0) {
-        //TODO: action for opening log
-        Toast.toast(Translator.translate('sync.failed'));
-        WhiteBoardUtil.setSyncInProgress(false);
-        Logger.info('=== FINISHING SYNC ===');
-        return;
+    return new Promise<void>((resolve) => {
+      if (BackendUtils.SYNC_MUTEX.isLocked()) {
+        Toast.toast(Translator.translate('waiting.previous.sync'));
       }
+      BackendUtils.SYNC_MUTEX.acquire().then(async (release) => {
+        Logger.info('=== STARTING SYNC ===');
+        const t0 = Date.now();
+        WhiteBoardUtil.setSyncInProgress(true);
+        try {
+          await BackendUtils.fsSync(true);
+          const returnCode = await BackendUtils.rcloneSync(winner, resync);
 
-      await BackendUtils.fsSync(false);
-      Toast.toast(Translator.translate('sync.succesful', { time: (Date.now() - t0) / 1000 }));
-      // eslint-disable-next-line no-empty
-    } catch (e) {
-      Toast.toast(Translator.translate('sync.failed'));
-      Logger.error('Sync exception', e);
-    }
-    Logger.info('=== FINISHING SYNC ===');
-    WhiteBoardUtil.setSyncInProgress(false);
+          if (returnCode != 0) {
+            //TODO: action for opening log
+            Toast.toast(Translator.translate('sync.failed'));
+            WhiteBoardUtil.setSyncInProgress(false);
+            Logger.info('=== FINISHING SYNC ===');
+            release();
+            resolve();
+            return;
+          }
+
+          await BackendUtils.fsSync(false);
+          Toast.toast(Translator.translate('sync.succesful', { time: (Date.now() - t0) / 1000 }));
+          // eslint-disable-next-line no-empty
+        } catch (e) {
+          Toast.toast(Translator.translate('sync.failed'));
+          Logger.error('Sync exception', e);
+        }
+        Logger.info('=== FINISHING SYNC ===');
+        WhiteBoardUtil.setSyncInProgress(false);
+        release();
+        resolve();
+      });
+    });
   }
 
   public static async doSynchronizationForGame(onStart: boolean, pid: number): Promise<void> {

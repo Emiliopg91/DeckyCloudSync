@@ -52,6 +52,7 @@
     "typescript": "^5.6.2"
   },
   "dependencies": {
+    "async-mutex": "^0.5.0",
     "lodash": "^4.17.21",
     "react-icons": "^4.12.0"
   },
