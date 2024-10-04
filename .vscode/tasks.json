@@ -19,7 +19,8 @@
         "args": [
           "deploy"
         ]
-      }
+      },
+      "problemMatcher": []
     },
     {
       "label": "setup",

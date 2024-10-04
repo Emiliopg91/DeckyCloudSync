@@ -68,7 +68,7 @@ def get_config():
         for key, value in current.items():
             new_key = parent_key + '.' + key if parent_key else key
 
-            if isinstance(value, dict):
+            if isinstance(value, dict) and value:
                 # Si el valor es otro diccionario, lo añadimos a la pila para seguir recorriendo
                 stack.append((value, new_key))
             else:

@@ -90,7 +90,7 @@ class Builder:
             with open(Utils.plugin_package_json) as f:
                 package_data = json.load(f)
 
-            remote_binaries = package_data.get("remote_binary", [])
+            remote_binaries = package_data.get("devRemoteBinaries", [])
             if not remote_binaries:
                 return
 
@@ -102,7 +102,7 @@ class Builder:
                 log_file.write(f"    {os.path.basename(url)}\n")
 
                 if not url or not expected_checksum or not dest_filename:
-                    log_file.write("      Error: Missing fields in remote_binary configuration\n")
+                    log_file.write("      Error: Missing fields in devRemoteBinaries configuration\n")
                     exit(1)
 
                 dest_file_path = os.path.join(self.plugin_dir, dest_filename)
