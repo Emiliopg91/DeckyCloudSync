@@ -6,6 +6,7 @@ import { FaCloudUploadAlt, FaPlug } from 'react-icons/fa';
 import { GlobalContext } from '../../contexts/globalContext';
 import { BackendUtils } from '../../utils/backend';
 import { Constants } from '../../utils/constants';
+import { NavigationUtil } from '../../utils/navigation';
 import { WhiteBoardUtil } from '../../utils/whiteboard';
 import { ButtonWithIcon } from '../ui/buttonWithIcon';
 
@@ -20,15 +21,7 @@ export const LogsBlock: FC = () => {
             <ButtonWithIcon
               layout="below"
               onClick={() => {
-                (async (): Promise<void> => {
-                  let logs = await BackendUtils.getPluginLog();
-                  if (!logs || logs == '') {
-                    logs = Translator.translate('no.available.logs');
-                  }
-                  WhiteBoardUtil.setLog(logs);
-                  Navigation.Navigate(Constants.PATH_PLUGIN_LOG);
-                  Navigation.CloseSideMenus();
-                })();
+                NavigationUtil.openLogPage(false);
               }}
               icon={<FaPlug />}
             >
@@ -41,15 +34,7 @@ export const LogsBlock: FC = () => {
                 layout="below"
                 disabled={syncInProgress}
                 onClick={() => {
-                  (async (): Promise<void> => {
-                    let logs = await BackendUtils.getSyncLog();
-                    if (!logs || logs == '') {
-                      logs = Translator.translate('no.available.logs');
-                    }
-                    WhiteBoardUtil.setLog(logs);
-                    Navigation.Navigate(Constants.PATH_SYNC_LOG);
-                    Navigation.CloseSideMenus();
-                  })();
+                  NavigationUtil.openLogPage(true);
                 }}
                 icon={<FaCloudUploadAlt />}
               >

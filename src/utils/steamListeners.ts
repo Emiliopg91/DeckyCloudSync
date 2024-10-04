@@ -38,9 +38,6 @@ export class SteamListeners {
   }
 
   private static syncGame(e: GameLifeEventData): void {
-    if (e.isRunning()) {
-      Toast.toast(Translator.translate('synchronizing.savedata'));
-    }
     BackendUtils.doSynchronizationForGame(e.isRunning(), e.getPID());
   }
 

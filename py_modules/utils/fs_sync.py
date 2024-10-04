@@ -52,7 +52,7 @@ class FsSync:
         total_size = 0  # Variable to accumulate the total size of copied files
         log_entries = []
         
-        decky.logger.info(f"Processing {entry_name}")
+        decky.logger.info(f"  Processing {entry_name}")
 
         # Process inclusions
         files_to_copy = set()
@@ -140,6 +140,9 @@ class FsSync:
             return f"{speed_bytes_per_sec:.2f} B/s"
 
     def copyToRemote():
+        decky.logger.info("")
+        decky.logger.info("Copying to remote")
+
         created_files = 0
         modified_files = 0
         deleted_files = 0
@@ -151,7 +154,7 @@ class FsSync:
         data = FsSync.read_json(Constants.plugin_settings)["entries"]
 
         # Process each entry in the JSON
-        for entry_name, details in data.items():
+        for entry_name, details in sorted(data.items()):
             folder_path = details['folder']
             inclusions = details.get('inclusions', ['*'])
             exclusions = set(details.get('exclusions', []))
@@ -172,8 +175,12 @@ class FsSync:
         decky.logger.info("")
         decky.logger.info(f"Created: {created_files}, Modified: {modified_files}, Deleted: {deleted_files}")
         decky.logger.info(f"Copied: {FsSync.format_size(total_size)} in {display_time} seconds ({FsSync.format_speed(speed)})")
+        decky.logger.info("")
 
     def copyFromRemote():
+        decky.logger.info("")
+        decky.logger.info("Copying to local")
+
         created_files = 0
         modified_files = 0
         deleted_files = 0
@@ -185,7 +192,7 @@ class FsSync:
         data = FsSync.read_json(Constants.plugin_settings)["entries"]
         
         # Process each entry in the JSON
-        for entry_name, details in data.items():
+        for entry_name, details in sorted(data.items()):
             folder_path = details['folder']
             inclusions = details.get('inclusions', ['*'])
             exclusions = set(details.get('exclusions', []))
@@ -206,6 +213,7 @@ class FsSync:
         decky.logger.info("")
         decky.logger.info(f"Created: {created_files}, Modified: {modified_files}, Deleted: {deleted_files}")
         decky.logger.info(f"Copied: {FsSync.format_size(total_size)} in {display_time} seconds ({FsSync.format_speed(speed)})")
+        decky.logger.info("")
 
     def simulate_for_entry(entry:dict):
         # Process inclusions

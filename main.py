@@ -48,8 +48,8 @@ class Plugin:
     async def configure(self, backend_type:str):
         return await RCloneManager.configure(backend_type)
 
-    async def rclone_sync(self, winner: str, resync: bool) :
-        return RCloneManager.sync(winner,resync)
+    async def rclone_sync(self, winner: str, mode: int) :
+        return RCloneManager.sync(winner,mode)
     
 # FileSystem sync
 

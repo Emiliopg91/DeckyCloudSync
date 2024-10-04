@@ -1,8 +1,9 @@
+import packageJson from '../../package.json';
 import plugin from '../../plugin.json';
 
 export class Constants {
   public static PLUGIN_NAME = plugin.name;
-  public static PLUGIN_VERSION = plugin.version;
+  public static PLUGIN_VERSION = packageJson.version;
 
   private static PATH_BASE = '/decky-cloud-sync-';
 

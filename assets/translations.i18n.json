@@ -179,6 +179,18 @@
     "en": "Synchronizing Data",
     "es": "Sincronizando datos"
   },
+  "waiting.previous.sync": {
+    "en": "Waiting for previous sync",
+    "es": "Esperando sincronización anterior"
+  },
+  "forcing.sync": {
+    "en": "Forcing sync",
+    "es": "Forzando sincronización"
+  },
+  "force.now": {
+    "en": "Force now",
+    "es": "Forzar ahora"
+  },
   "other.providers": {
     "en": "",
     "es": ""

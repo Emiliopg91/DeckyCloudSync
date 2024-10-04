@@ -57,44 +57,46 @@ export const ConfigurePathsPage: FC = () => {
           </PanelSectionRow>
           <PanelSectionRow>
             <table>
-              {Object.keys(entries).map((key, idx) => {
-                return (
-                  <tr key={idx}>
-                    <td>{key}</td>
-                    <td>
-                      <ButtonWithIcon
-                        icon={<FaPen />}
-                        onClick={() => {
-                          WhiteBoardUtil.setPathToEdit({ name: key, path: entries[key] });
-                          Navigation.Navigate(Constants.PATH_CONFIGURE_SPECIFIC_PATH);
-                        }}
-                      >
-                        {Translator.translate('edit.entry')}
-                      </ButtonWithIcon>
-                    </td>
-                    <td>
-                      <ButtonWithIcon
-                        icon={<FaTrash />}
-                        onClick={() => {
-                          showModal(
-                            <ConfirmModal
-                              strTitle={Translator.translate('confirm.remove.entry')}
-                              strDescription={Translator.translate('description.remove.entry')}
-                              strOKButtonText={Translator.translate('remove.entry')}
-                              strCancelButtonText={Translator.translate('cancel')}
-                              onOK={() => {
-                                onDeleteEntry(key);
-                              }}
-                            />
-                          );
-                        }}
-                      >
-                        {Translator.translate('remove.entry')}
-                      </ButtonWithIcon>
-                    </td>
-                  </tr>
-                );
-              })}
+              {Object.keys(entries)
+                .sort()
+                .map((key, idx) => {
+                  return (
+                    <tr key={idx}>
+                      <td>{key}</td>
+                      <td>
+                        <ButtonWithIcon
+                          icon={<FaPen />}
+                          onClick={() => {
+                            WhiteBoardUtil.setPathToEdit({ name: key, path: entries[key] });
+                            Navigation.Navigate(Constants.PATH_CONFIGURE_SPECIFIC_PATH);
+                          }}
+                        >
+                          {Translator.translate('edit.entry')}
+                        </ButtonWithIcon>
+                      </td>
+                      <td>
+                        <ButtonWithIcon
+                          icon={<FaTrash />}
+                          onClick={() => {
+                            showModal(
+                              <ConfirmModal
+                                strTitle={Translator.translate('confirm.remove.entry')}
+                                strDescription={Translator.translate('description.remove.entry')}
+                                strOKButtonText={Translator.translate('remove.entry')}
+                                strCancelButtonText={Translator.translate('cancel')}
+                                onOK={() => {
+                                  onDeleteEntry(key);
+                                }}
+                              />
+                            );
+                          }}
+                        >
+                          {Translator.translate('remove.entry')}
+                        </ButtonWithIcon>
+                      </td>
+                    </tr>
+                  );
+                })}
             </table>
           </PanelSectionRow>
         </div>

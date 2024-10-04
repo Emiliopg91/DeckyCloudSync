@@ -24,7 +24,7 @@ class RCloneManager:
         return current_spawn.returncode
 
     @staticmethod
-    def sync(winner: str, resync: bool) -> int:
+    def sync(winner: str, mode: int) -> int:
         logger_utils.log("INFO", "Deleting lock files.")
         for hgx in glob(decky.HOME + "/.cache/rclone/bisync/*.lck"):
             os.remove(hgx)
@@ -32,12 +32,22 @@ class RCloneManager:
         destination_path = plugin_config.get_config_item("settings.remote.directory", "decky-cloud-sync")
         args = ["bisync", Constants.remote_dir, f"backend:{destination_path}", "--copy-links"]
 
-        if resync:
-            args.extend(["--resync-mode", winner, "--resync"])
-        else:
+        if mode == 0: 
+            """Normal mode"""
+            logger_utils.log("INFO","Performing standard sync")
             args.extend(["--conflict-resolve", winner])
+        elif mode == 1:
+            """For resync mode"""
+            args.extend(["--resync-mode", winner, "--resync"])
+            logger_utils.log("INFO","Performing resync")
+        elif mode == 2:
+            """For force mode"""
+            args.extend(["--conflict-resolve", winner])
+            args.extend(["--force"])
+            logger_utils.log("INFO","Performing forced sync")
 
-        args.extend(["--transfers", "8", "--checkers", "16", "--config", Constants.rclone_settings, "--log-file",
+        threads = str(os.cpu_count())
+        args.extend(["--transfers", threads, "--checkers", threads, "--config", Constants.rclone_settings, "--log-file",
                     decky.DECKY_PLUGIN_LOG, "--log-format", "none", "-v"])
 
         cmd = [Constants.rclone_bin, *args]

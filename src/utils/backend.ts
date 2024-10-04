@@ -1,8 +1,12 @@
+import { Navigation } from '@decky/ui';
 import { Mutex } from 'async-mutex';
 import { Backend, Logger, Translator } from 'decky-plugin-framework';
 
 import { Signal } from '../models/signals';
+import { SyncMode } from '../models/syncModes';
 import { Winner } from '../models/winners';
+import { Constants } from './constants';
+import { NavigationUtil } from './navigation';
 import { Toast } from './toast';
 import { WhiteBoardUtil } from './whiteboard';
 
@@ -27,11 +31,11 @@ export class BackendUtils {
     return Backend.backend_call<[backend_type: string], number>('configure', backend_type);
   }
 
-  public static async rcloneSync(winner: Winner, resync: boolean): Promise<number> {
-    return Backend.backend_call<[winner: string, resync: boolean], number>(
+  public static async rcloneSync(winner: Winner, mode: SyncMode): Promise<number> {
+    return Backend.backend_call<[winner: string, mode: number], number>(
       'rclone_sync',
       winner,
-      resync
+      mode
     );
   }
 
@@ -51,22 +55,34 @@ export class BackendUtils {
     return Backend.backend_call<[], string>('get_remote_dir');
   }
 
-  public static async doSynchronization(winner: Winner, resync: boolean): Promise<void> {
+  public static async doSynchronization(winner: Winner, mode: SyncMode): Promise<void> {
     return new Promise<void>((resolve) => {
       if (BackendUtils.SYNC_MUTEX.isLocked()) {
         Toast.toast(Translator.translate('waiting.previous.sync'));
       }
       BackendUtils.SYNC_MUTEX.acquire().then(async (release) => {
+        switch (mode) {
+          case SyncMode.NORMAL:
+            Toast.toast(Translator.translate('synchronizing.savedata'));
+            break;
+          case SyncMode.RESYNC:
+            Toast.toast(Translator.translate('resynchronizing.savedata'));
+            break;
+          case SyncMode.FORCE:
+            Toast.toast(Translator.translate('forcing.sync'));
+            break;
+        }
         Logger.info('=== STARTING SYNC ===');
         const t0 = Date.now();
         WhiteBoardUtil.setSyncInProgress(true);
         try {
           await BackendUtils.fsSync(true);
-          const returnCode = await BackendUtils.rcloneSync(winner, resync);
+          const returnCode = await BackendUtils.rcloneSync(winner, mode);
 
           if (returnCode != 0) {
-            //TODO: action for opening log
-            Toast.toast(Translator.translate('sync.failed'));
+            Toast.toast(Translator.translate('sync.failed'), 5000, () => {
+              NavigationUtil.openLogPage(true);
+            });
             WhiteBoardUtil.setSyncInProgress(false);
             Logger.info('=== FINISHING SYNC ===');
             release();
@@ -94,7 +110,7 @@ export class BackendUtils {
       await BackendUtils.sendSignal(pid, Signal.SIGSTOP);
     }
 
-    await BackendUtils.doSynchronization(onStart ? Winner.REMOTE : Winner.LOCAL, false);
+    await BackendUtils.doSynchronization(onStart ? Winner.REMOTE : Winner.LOCAL, SyncMode.NORMAL);
 
     if (onStart) {
       await BackendUtils.sendSignal(pid, Signal.SIGCONT);
