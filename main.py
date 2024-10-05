@@ -49,7 +49,10 @@ class Plugin:
         return await RCloneManager.configure(backend_type)
 
     async def rclone_sync(self, winner: str, mode: int) :
-        return RCloneManager.sync(winner,mode)
+        return await RCloneManager.sync(winner,mode)
+    
+    async def check_status(self) -> int:
+        return RCloneManager.check_status()
     
 # FileSystem sync
 

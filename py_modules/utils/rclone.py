@@ -1,6 +1,6 @@
 import subprocess
 import asyncio
-from asyncio.subprocess import create_subprocess_exec
+from asyncio.subprocess import create_subprocess_exec, Process
 import decky
 import logger_utils
 import plugin_config
@@ -11,6 +11,7 @@ from utils.constants import Constants
 
 
 class RCloneManager:
+    running_instance: Process | None =   None
 
     @staticmethod
     async def configure(backend_type:str):
@@ -24,7 +25,7 @@ class RCloneManager:
         return current_spawn.returncode
 
     @staticmethod
-    def sync(winner: str, mode: int) -> int:
+    async def sync(winner: str, mode: int):
         logger_utils.log("INFO", "Deleting lock files.")
         for hgx in glob(decky.HOME + "/.cache/rclone/bisync/*.lck"):
             os.remove(hgx)
@@ -53,8 +54,15 @@ class RCloneManager:
         cmd = [Constants.rclone_bin, *args]
 
         logger_utils.log("INFO", f"Running command: {subprocess.list2cmdline(cmd)}")
-        result = subprocess.run(cmd)
-        logger_utils.log("INFO", f"Result code: {result.returncode}")
-
-        return result.returncode
+        RCloneManager.running_instance = await create_subprocess_exec(*cmd)
+        return True
     
+    def check_status() -> int:
+        if RCloneManager.running_instance is None or RCloneManager.running_instance.returncode is None:
+            return -1
+        
+        code = RCloneManager.running_instance.returncode
+        RCloneManager.running_instance = None
+        logger_utils.log("INFO", f"Result code: {code}")
+        return code
+            

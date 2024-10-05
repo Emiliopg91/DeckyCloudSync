@@ -1,4 +1,4 @@
-import { Navigation } from '@decky/ui';
+import { Navigation, sleep } from '@decky/ui';
 import { Mutex } from 'async-mutex';
 import { Backend, Logger, Translator } from 'decky-plugin-framework';
 
@@ -77,7 +77,13 @@ export class BackendUtils {
         WhiteBoardUtil.setSyncInProgress(true);
         try {
           await BackendUtils.fsSync(true);
-          const returnCode = await BackendUtils.rcloneSync(winner, mode);
+
+          await BackendUtils.rcloneSync(winner, mode);
+          let returnCode = -2;
+          do {
+            await sleep(200);
+            returnCode = await BackendUtils.checkStatus();
+          } while (returnCode < 0);
 
           if (returnCode != 0) {
             Toast.toast(Translator.translate('sync.failed'), 5000, () => {
@@ -92,10 +98,11 @@ export class BackendUtils {
 
           await BackendUtils.fsSync(false);
           Toast.toast(Translator.translate('sync.succesful', { time: (Date.now() - t0) / 1000 }));
-          // eslint-disable-next-line no-empty
         } catch (e) {
-          Toast.toast(Translator.translate('sync.failed'));
           Logger.error('Sync exception', e);
+          Toast.toast(Translator.translate('sync.failed'), 5000, () => {
+            NavigationUtil.openLogPage(true);
+          });
         }
         Logger.info('=== FINISHING SYNC ===');
         WhiteBoardUtil.setSyncInProgress(false);
@@ -115,5 +122,9 @@ export class BackendUtils {
     if (onStart) {
       await BackendUtils.sendSignal(pid, Signal.SIGCONT);
     }
+  }
+
+  private static async checkStatus(): Promise<number> {
+    return Backend.backend_call<[], number>('check_status');
   }
 }

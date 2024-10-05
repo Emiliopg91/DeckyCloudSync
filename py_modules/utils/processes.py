@@ -27,7 +27,7 @@ class Processes:
         return children;
 
     @staticmethod
-    def send_signal(pid: int, signal: signal.Signals, parent: bool = True):
+    def send_signal(pid: int, signal: signal.Signals, parent: bool = True) -> int:
         """
         Sends a signal to a process and its child processes recursively.
 
@@ -43,11 +43,13 @@ class Processes:
                 logger_utils.log("INFO", f"Sending signal {signal} to process PID {pid} and children.")
 
             os.kill(pid, signal)
+            count = 1
 
             child_pids = Processes._get_process_tree(pid)
-
             for child_pid in child_pids:
-                Processes.send_signal(child_pid, signal)
+                count = count + Processes.send_signal(child_pid, signal)
                 
+            if(parent):
+                logger_utils.log("INFO", f"Signaled {count} processes")
         except Exception as e:
             logger_utils.log("ERROR", f"Error sending signal to process: {e}")
