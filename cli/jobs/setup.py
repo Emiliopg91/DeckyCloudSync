@@ -58,13 +58,11 @@ class Setup:
         with open(self.settings_path, 'w') as file:
             json.dump(config_data, file, indent=4)
 
-
-
     def generate_id_rsa(self):
         try:
             print("  Generating RSA key for SSH")
-            Utils.run_command(["ssh-keygen", "-t", "rsa", "-f", f"{Utils.id_rsa_file}"], True, self.log_key_copy)
-            print(f"    SSH key generated. Ensure appending local '{Utils.id_rsa_file}.pub' to Deck's '~/.ssh/authorized_keys'")
+            Utils.run_command(["ssh-keygen", "-t", "rsa", "-f", Utils.id_rsa_file], True, self.log_key_copy)
+            print("    SSH key generated. Ensure appending local '" + Utils.id_rsa_file + ".pub' to Deck's '~/.ssh/authorized_keys'")
             exit(0)
         except Exception as e:
             Utils.handle_error(e, self.log_key_copy)

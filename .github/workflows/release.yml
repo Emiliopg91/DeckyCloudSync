@@ -1,0 +1,113 @@
+name: Build and Publish Release
+
+permissions:
+  contents: write
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  CompileAndRelease:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Get version from package.json
+        id: get_version
+        run: |
+          VERSION=$(jq -r '.version' package.json | sed 's/-.*//')
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "Package version: $VERSION"
+
+      - name: Bump to release version
+        run: |
+          npm version --no-commit-hooks --no-git-tag-version ${{ env.VERSION }}
+
+      - name: Commit and push changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add package.json
+          git commit -m "Bump to release version"
+          git push origin HEAD:main
+
+      - name: Fix permissions
+        run: |
+          chmod 777 -R .
+
+      - name: Setup Docker
+        uses: docker/setup-buildx-action@v1
+
+      - name: build plugin
+        run: |
+          npm i -g pnpm@8.5.1 shx@0.3.4
+          python3 cli/decky.py build
+
+      - name: Publish Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: DeckyCloudSync
+          path: out/DeckyCloudSync.tar.gz
+
+      - name: Create and push tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git tag -a "${{ env.VERSION }}" -m "Release version ${{ env.VERSION }}"
+          git push origin "${{ env.VERSION }}"
+
+      - name: Checkout develop branch
+        run: |
+          git restore .
+          git fetch origin
+          git checkout develop
+          git pull origin develop
+
+      - name: Merge main into develop
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git merge -X theirs main --allow-unrelated-histories
+          git push origin HEAD:develop --force
+
+      - name: Bump version to next DEV version
+        run: |
+          npm version --no-commit-hooks --no-git-tag-version prepatch --preid dev
+          jq '.version |= sub("-dev\\.0$"; "-dev")' package.json > package.tmp.json
+          mv package.tmp.json package.json
+
+      - name: Commit and push changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add package.json
+          git commit -m "Bump version to new development version"
+          git push origin HEAD:develop
+
+      - run: mkdir /tmp/artifacts
+
+      - name: download artifact
+        uses: actions/download-artifact@v3
+        with:
+          path: /tmp/artifacts
+
+      - run: ls -R /tmp/artifacts
+
+      - name: publish to github release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: /tmp/artifacts/DeckyCloudSync/DeckyCloudSync.tar.gz
+          tag_name: ${{ env.VERSION }}
+          name: ${{ env.VERSION }}
+          body: |
+            DeckyCloudSync
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

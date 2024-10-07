@@ -9,7 +9,7 @@ class Builder:
         # Global variables
         self.plugin_dir = Utils.plugin_dir
         self.plugin_name = Utils.plugin_name
-        self.plugin_backend_image = f"decky/{self.plugin_name.lower()}"
+        self.plugin_backend_image = "decky/" + self.plugin_name.lower()
         self.plugin_backend_dir = os.path.join(self.plugin_dir, "backend")
         self.plugin_defaults_dir = os.path.join(self.plugin_dir, "defaults")
         self.plugin_py_dir = os.path.join(self.plugin_dir, "py_modules")
@@ -63,11 +63,11 @@ class Builder:
                 Utils.run_command(["rm", "-r", self.plugin_backend_output_dir], True, self.log_backend_build_backend)
             Utils.run_command(["mkdir", "-p", self.plugin_backend_output_dir], False, self.log_backend_build_backend)
             Utils.run_command([self.plugin_cp, "build", "-f", self.plugin_backend_dockerfile_dir, "-t", self.plugin_backend_image, self.plugin_dir], True, self.log_backend_build_backend)
-            Utils.run_command(["chmod", "-R", "777", f"{self.plugin_dir}"], True, self.log_backend_build_backend)
+            Utils.run_command(["chmod", "-R", "777", self.plugin_dir], True, self.log_backend_build_backend)
             Utils.run_command([self.plugin_cp, "run", "--rm", "-e", "RELEASE_TYPE=production", "--privileged",
-                            "-v", f"{self.plugin_backend_dir}:/backend",
-                            "-v", f"{self.plugin_backend_output_dir}:/backend/out",
-                            "-v", f"{self.plugin_dir}:/plugin", self.plugin_backend_image], True, self.log_backend_build_backend)
+                            "-v", self.plugin_backend_dir + ":/backend",
+                            "-v", self.plugin_backend_output_dir + ":/backend/out",
+                            "-v", self.plugin_dir + ":/plugin", self.plugin_backend_image], True, self.log_backend_build_backend)
             Utils.run_command(["cp", "-r", self.plugin_backend_output_dir + "/.", self.build_out_dir], True, self.log_backend_build_backend)
 
     def _copy_additional_files(self):
@@ -84,7 +84,7 @@ class Builder:
         with open(self.log_binary_copy, 'a') as log_file:
             print("  Copying remote binaries")
             if not os.path.exists(Utils.plugin_package_json):
-                log_file.write(f"    Failed to read {Utils.plugin_package_json}\n")
+                log_file.write("    Failed to read " + Utils.plugin_package_json + "\n")
                 exit(1)
 
             with open(Utils.plugin_package_json) as f:
@@ -98,8 +98,8 @@ class Builder:
                 url = binary.get('url', '')
                 expected_checksum = binary.get('sha256hash', '')
                 dest_filename = binary.get('name', '')
-                print(f"    {os.path.basename(url)}")
-                log_file.write(f"    {os.path.basename(url)}\n")
+                print("    " + os.path.basename(url))
+                log_file.write("    " + os.path.basename(url) + "\n")
 
                 if not url or not expected_checksum or not dest_filename:
                     log_file.write("      Error: Missing fields in devRemoteBinaries configuration\n")
@@ -107,45 +107,41 @@ class Builder:
 
                 dest_file_path = os.path.join(self.plugin_dir, dest_filename)
 
-                # Check if the file already exists and validate checksum
                 if os.path.exists(dest_file_path):
                     actual_checksum = hashlib.sha256(open(dest_file_path, 'rb').read()).hexdigest()
                     if actual_checksum == expected_checksum:
-                        print(f"      File already exists and checksums match: {dest_file_path}")
+                        print("      File already exists and checksums match: " + dest_file_path)
                         continue
                     else:
-                        print(f"      Checksum mismatch for existing file, removing: {dest_file_path}")
+                        print("      Checksum mismatch for existing file, removing: " + dest_file_path)
                         os.remove(dest_file_path)
 
-                # Download the binary
-                print(f"      Downloading binary from: {url}")
-                log_file.write(f"      Downloading binary from: {url}\n")
+                print("      Downloading binary from: " + url)
+                log_file.write("      Downloading binary from: " + url + "\n")
 
                 Utils.run_command(["wget", "-q", "-O", dest_file_path, url], True, self.log_binary_copy)
 
-                # Calculate the checksum again after download
                 actual_checksum = hashlib.sha256(open(dest_file_path, 'rb').read()).hexdigest()
 
-                # Compare the checksums
                 if actual_checksum == expected_checksum:
-                    print(f"        File saved to {dest_file_path}")
+                    print("        File saved to " + dest_file_path)
                 else:
-                    print(f"        Error: Checksums do not match for file at URL: {url}. Expected: {expected_checksum}, Got: {actual_checksum}")
-                    log_file.write(f"        Error: Checksums do not match for file at URL: {url}. Expected: {expected_checksum}, Got: {actual_checksum}\n")
+                    print("        Error: Checksums do not match for file at URL: " + url + ". Expected: " + expected_checksum + ", Got: " + actual_checksum)
+                    log_file.write("        Error: Checksums do not match for file at URL: " + url + ". Expected: " + expected_checksum + ", Got: " + actual_checksum + "\n")
                     exit(1)
 
     def _package_plugin(self):
         print("  Packaging plugin")
         os.chdir(self.build_out_base_dir)
         try:
-            Utils.run_command(["tar", "-czvf", f"{self.plugin_name}.tar.gz", self.plugin_name], True, self.log_package_plugin)
-            Utils.run_command(["zip", "-r", f"{self.plugin_name}.zip", self.plugin_name], True, self.log_package_plugin)
+            Utils.run_command(["tar", "-czvf", self.plugin_name + ".tar.gz", self.plugin_name], True, self.log_package_plugin)
+            Utils.run_command(["zip", "-r", self.plugin_name + ".zip", self.plugin_name], True, self.log_package_plugin)
         except Exception as e:
             os.chdir(self.plugin_dir)
         os.chdir(self.plugin_dir)
 
     def build(self):
-        print(f"Building plugin {self.plugin_name}")
+        print("Building plugin " + self.plugin_name)
         self.plugin_cp = self._check_container_runtime()
         self._clean_directories()
         self._build_frontend()
