@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import { definePlugin, routerHook } from '@decky/api';
 import { sleep, staticClasses } from '@decky/ui';
-import { Framework, Logger, Toast, Translator } from 'decky-plugin-framework';
+import { Framework, Logger, Translator } from 'decky-plugin-framework';
 
 import translations from '../assets/translations.i18n.json';
 import pckJson from '../package.json';
@@ -16,6 +16,7 @@ import { BackendUtils } from './utils/backend';
 import { Constants } from './utils/constants';
 import { PluginSettings } from './utils/pluginSettings';
 import { SteamListeners } from './utils/steamListeners';
+import { Toast } from './utils/toast';
 import { WhiteBoardUtil } from './utils/whiteboard';
 
 let pluginUpdateCheckTimer: NodeJS.Timeout | undefined;
