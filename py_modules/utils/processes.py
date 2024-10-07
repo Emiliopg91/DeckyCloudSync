@@ -47,9 +47,11 @@ class Processes:
 
             child_pids = Processes._get_process_tree(pid)
             for child_pid in child_pids:
-                count = count + Processes.send_signal(child_pid, signal)
+                count = count + Processes.send_signal(child_pid, signal, False)
                 
             if(parent):
                 decky.logger.info( f"Signaled {count} processes")
+            return count
         except Exception as e:
             decky.logger.error(f"Error sending signal to process: {e}")
+        return 0
