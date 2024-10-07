@@ -78,4 +78,12 @@ export class WhiteBoardUtil {
   public static setMenuEntry(value: MenuEntry): void {
     WhiteBoard.set('menuEntry', value);
   }
+
+  public static getPluginLatestVersion(): string {
+    return WhiteBoard.get('pluginLatestVersion') || '';
+  }
+
+  public static setPluginLatestVersion(value: string): void {
+    WhiteBoard.set('pluginLatestVersion', value);
+  }
 }

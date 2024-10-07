@@ -88,8 +88,6 @@ class Plugin:
     
 #Plugin update
     async def ota_update(self):
-        decky.logger.debug("Executing: ota_update()")
-        # trigger ota update
         try:
             return PluginUpdate.ota_update()
         except Exception as e:
