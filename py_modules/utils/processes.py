@@ -1,7 +1,7 @@
 import os
 import signal
 import subprocess
-import logger_utils
+import decky
 
 class Processes:
     @staticmethod
@@ -40,16 +40,18 @@ class Processes:
         """
         try:
             if(parent):
-                logger_utils.log("INFO", f"Sending signal {signal} to process PID {pid} and children.")
+                decky.logger.info( f"Sending signal {signal} to process PID {pid} and children.")
 
             os.kill(pid, signal)
             count = 1
 
             child_pids = Processes._get_process_tree(pid)
             for child_pid in child_pids:
-                count = count + Processes.send_signal(child_pid, signal)
+                count = count + Processes.send_signal(child_pid, signal, False)
                 
             if(parent):
-                logger_utils.log("INFO", f"Signaled {count} processes")
+                decky.logger.info( f"Signaled {count} processes")
+            return count
         except Exception as e:
-            logger_utils.log("ERROR", f"Error sending signal to process: {e}")
+            decky.logger.error(f"Error sending signal to process: {e}")
+        return 0

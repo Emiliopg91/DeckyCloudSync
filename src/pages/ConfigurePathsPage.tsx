@@ -7,10 +7,10 @@ import {
   TextField,
   showModal
 } from '@decky/ui';
-import { Logger, Translator } from 'decky-plugin-framework';
+import { Translator } from 'decky-plugin-framework';
 import { debounce } from 'lodash';
 import { FC, useCallback, useState } from 'react';
-import { FaEdit, FaPen, FaTrash } from 'react-icons/fa';
+import { FaPen, FaTrash } from 'react-icons/fa';
 
 import { ButtonWithIcon } from '../components/ui/buttonWithIcon';
 import { Constants } from '../utils/constants';

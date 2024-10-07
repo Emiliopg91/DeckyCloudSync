@@ -168,12 +168,12 @@
     "es": "Guardar"
   },
   "sync.failed": {
-    "en": "Sync Error",
-    "es": "Error de sincronización"
+    "en": "Sync error.",
+    "es": "Error de sincronización."
   },
   "sync.succesful": {
-    "en": "Sync completed in {{time}}",
-    "es": "Sincronización finalizada en {{time}}"
+    "en": "Sync completed in {{time}}.",
+    "es": "Sincronización finalizada en {{time}}."
   },
   "synchronizing.savedata": {
     "en": "Synchronizing Data",

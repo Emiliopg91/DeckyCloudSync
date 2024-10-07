@@ -6,8 +6,7 @@ import os
 import decky
 from plugin_config import PluginConfig
 from plugin_update import PluginUpdate
-import logger_utils
-import signal
+from plugin_logger import PluginLogger
 from utils.rclone import RCloneManager
 from utils.processes import Processes
 from utils.fs_sync import FsSync
@@ -15,8 +14,22 @@ from utils.logs import LogManager
 from utils.constants import Constants
 
 class Plugin:
+
     
+# Lifecycle 
+    async def _main(self):
+        PluginLogger.configure_logger()
+        decky.logger.info("Running "+decky.DECKY_PLUGIN_NAME)
+
+    async def _unload(self):
+        decky.logger.info("Unloading "+decky.DECKY_PLUGIN_NAME)
+
+    async def _migration(self):
+        decky.logger.info("Migrating plugin configuration")
+        PluginConfig.migrate()
+
 # Configuration
+
     async def get_config(self):
         return PluginConfig.get_config()
 
@@ -29,20 +42,7 @@ class Plugin:
 # Logger
 
     async def log(self, level: str, msg: str) -> int:
-        return logger_utils.log(level, msg)
-    
-# Lifecycle
-
-    async def _main(self):
-        logger_utils.configure_logger()
-        decky.logger.info("Running "+decky.DECKY_PLUGIN_NAME)
-
-    async def _unload(self):
-        decky.logger.info("Unloading "+decky.DECKY_PLUGIN_NAME)
-
-    async def _migration(self):
-        decky.logger.info("Migrating plugin configuration")
-        PluginConfig.migrate()
+        return PluginLogger.log(level, msg)
 
 # RClone
 
