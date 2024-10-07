@@ -12,8 +12,8 @@ class Utils:
 
     @staticmethod
     def handle_error(e, log_file):
-        print(f"\nAn error has been produced: \n    {e}")
-        print(f"Check logs at {log_file}")
+        print("\nAn error has been produced: \n    "+str(e))
+        print("Check logs at "+log_file)
         exit(1)
 
     @staticmethod
@@ -21,13 +21,13 @@ class Utils:
         with open(log_file, 'a') as f:
             try:
                 f.write("########################################################################\n")
-                f.write(f"{" ".join(command)}\n\n\n")
+                f.write(" ".join(command)+"\n\n\n")
                 f.flush()
                 result = subprocess.run(command, stderr=f, stdout=f)
-                f.write(f"\n\nReturn code: {result.returncode}\n")
+                f.write("\n\nReturn code: "+str(result.returncode)+"\n")
                 f.flush()
                 if(check and result.returncode != 0):
-                    raise Exception(f"Unexpected error code {result.returncode}")
+                    raise Exception("Unexpected error code "+str(result.returncode))
                 f.write("########################################################################")
                 f.flush()
             except Exception as e:

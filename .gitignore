@@ -51,3 +51,5 @@ decky_plugin.py
 out
 
 .eslintcache
+
+backend/rclone.zip

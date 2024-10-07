@@ -6,7 +6,7 @@ from jobs.utils import Utils
 class TranslationUpdater:
     def __init__(self):
         self.root_directory = Utils.plugin_dir
-        self.translations_file = os.path.join(self.root_directory, "assets","translations.i18n.json")
+        self.translations_file = os.path.join(self.root_directory, "assets" + os.sep + "translations.i18n.json")
         # Patrón para `Translator.translate('<texto>')` o `Translator.translate('<texto>', <object>)`
         self.translate_pattern = re.compile(
             r"Translator\s*\.\s*translate\s*\(\s*['\"](.*?)['\"]\s*(?:,\s*(\{.*?\}))?\s*\)", 
@@ -33,7 +33,7 @@ class TranslationUpdater:
 
     def __update_translation_file(self, translations):
         if not os.path.exists(self.translations_file):
-            print(f"Missing file '{self.translations_file}'")
+            print("Missing file '" + self.translations_file + "'")
             return
 
         with open(self.translations_file, 'r', encoding='utf-8') as f:

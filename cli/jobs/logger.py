@@ -14,10 +14,10 @@ class LoggerOpener:
             self.deck_user = settings.get('deckuser')
             self.deck_dir = '/home/' + self.deck_user
 
-    def open(self):                
-        command =[
-            "ssh", f"{self.deck_user}@{self.deck_ip}", "-p", str(self.deck_port),
+    def open(self):
+        command = [
+            "ssh", self.deck_user + "@" + self.deck_ip, "-p", str(self.deck_port),
             "-t", "-i", Utils.id_rsa_file,
-            f"{self.deck_dir}/homebrew/plugins/{self.plugin_name}/openLastLog.sh"
-            ]
+            self.deck_dir + "/homebrew/plugins/" + self.plugin_name + "/openLastLog.sh"
+        ]
         subprocess.run(command)
