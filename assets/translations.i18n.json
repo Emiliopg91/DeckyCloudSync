@@ -213,7 +213,7 @@
   },
   "menu.sync": {
     "en": "Synchronization",
-    "es": "Sincronizacion"
+    "es": "Sincronización"
   },
   "menu.logs": {
     "en": "Logs",
@@ -270,5 +270,9 @@
   "other.advanced": {
     "en": "",
     "es": ""
+  },
+  "update.available": {
+    "en": "Update available. Click to install",
+    "es": "Actualización disponible. Pulse para instalar"
   }
 }
