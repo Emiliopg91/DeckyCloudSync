@@ -1,12 +1,11 @@
 import { ConfirmModal, showModal, sleep } from '@decky/ui';
 import { Mutex } from 'async-mutex';
-import { Backend, Logger, Translator } from 'decky-plugin-framework';
+import { Backend, Logger, Toast, Translator } from 'decky-plugin-framework';
 
 import { Signal } from '../models/signals';
 import { SyncMode } from '../models/syncModes';
 import { Winner } from '../models/winners';
 import { NavigationUtil } from './navigation';
-import { Toast } from './toast';
 import { WhiteBoardUtil } from './whiteboard';
 
 /**
@@ -97,7 +96,13 @@ export class BackendUtils {
             }
 
             await BackendUtils.fsSync(false);
-            Toast.toast(Translator.translate('sync.succesful', { time: (Date.now() - t0) / 1000 }));
+            Toast.toast(
+              Translator.translate('sync.succesful', { time: (Date.now() - t0) / 1000 }),
+              2000,
+              () => {
+                NavigationUtil.openLogPage(true);
+              }
+            );
           } catch (e) {
             Logger.error('Sync exception', e);
             Toast.toast(Translator.translate('sync.failed'), 5000, () => {

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import { definePlugin, routerHook } from '@decky/api';
 import { sleep, staticClasses } from '@decky/ui';
-import { Framework, Logger, Translator } from 'decky-plugin-framework';
+import { Framework, Logger, Toast, Translator } from 'decky-plugin-framework';
 
 import translations from '../assets/translations.i18n.json';
 import pckJson from '../package.json';
@@ -16,7 +16,6 @@ import { BackendUtils } from './utils/backend';
 import { Constants } from './utils/constants';
 import { PluginSettings } from './utils/pluginSettings';
 import { SteamListeners } from './utils/steamListeners';
-import { Toast } from './utils/toast';
 import { WhiteBoardUtil } from './utils/whiteboard';
 
 let pluginUpdateCheckTimer: NodeJS.Timeout | undefined;
@@ -57,7 +56,24 @@ const checkPluginLatestVersion = async (): Promise<void> => {
 
 export default definePlugin(() => {
   (async (): Promise<void> => {
-    await Framework.initialize(Constants.PLUGIN_NAME, Constants.PLUGIN_VERSION, translations);
+    await Framework.initialize(Constants.PLUGIN_NAME, Constants.PLUGIN_VERSION, {
+      translator: {
+        translations
+      },
+      game: {
+        lifeCycle: true
+      },
+      system: {
+        network: true
+      },
+      toast: {
+        logo: window.SP_REACT.createElement(PluginIcon, {
+          fontSize: '30',
+          style: { marginLeft: 5, marginTop: 5 }
+        })
+      }
+    });
+
     PluginSettings.initialize();
     WhiteBoardUtil.setProvider(PluginSettings.settings.settings.remote.provider);
     SteamListeners.bind();
@@ -78,12 +94,12 @@ export default definePlugin(() => {
       exact: true
     });
 
-    sleep(5000).then(() => {
-      if (!Constants.PLUGIN_VERSION.endsWith('dev')) {
+    if (!Constants.PLUGIN_VERSION.endsWith('-dev')) {
+      sleep(5000).then(() => {
         pluginUpdateCheckTimer = setInterval(checkPluginLatestVersion, 60 * 60 * 1000);
         checkPluginLatestVersion();
-      }
-    });
+      });
+    }
   })();
 
   return {

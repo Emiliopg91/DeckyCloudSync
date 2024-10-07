@@ -1,13 +1,10 @@
-import { Navigation, PanelSection, PanelSectionRow } from '@decky/ui';
+import { PanelSection, PanelSectionRow } from '@decky/ui';
 import { Translator } from 'decky-plugin-framework';
 import { FC, useContext } from 'react';
 import { FaCloudUploadAlt, FaPlug } from 'react-icons/fa';
 
 import { GlobalContext } from '../../contexts/globalContext';
-import { BackendUtils } from '../../utils/backend';
-import { Constants } from '../../utils/constants';
 import { NavigationUtil } from '../../utils/navigation';
-import { WhiteBoardUtil } from '../../utils/whiteboard';
 import { ButtonWithIcon } from '../ui/buttonWithIcon';
 
 export const LogsBlock: FC = () => {

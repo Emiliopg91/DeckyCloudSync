@@ -4,12 +4,10 @@ import {
   EventType,
   GameLifeEventData,
   Logger,
-  NetworkEventData,
-  Translator
+  NetworkEventData
 } from 'decky-plugin-framework';
 
 import { BackendUtils } from './backend';
-import { Toast } from './toast';
 import { WhiteBoardUtil } from './whiteboard';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

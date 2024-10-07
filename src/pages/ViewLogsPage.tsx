@@ -1,11 +1,10 @@
 import { ButtonItem, Navigation, PanelSection, PanelSectionRow } from '@decky/ui';
 import { Translator } from 'decky-plugin-framework';
-import { FC, PropsWithChildren, useMemo, useState } from 'react';
+import { FC, useMemo, useState } from 'react';
 
 import { SyncMode } from '../models/syncModes';
 import { Winner } from '../models/winners';
 import { BackendUtils } from '../utils/backend';
-import { Toast } from '../utils/toast';
 import { WhiteBoardUtil } from '../utils/whiteboard';
 
 export interface ViewLogsPageProps {
@@ -15,6 +14,7 @@ export interface ViewLogsPageProps {
 export const ViewLogsPage: FC<ViewLogsPageProps> = ({ forSync }) => {
   Navigation.CloseSideMenus();
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [logs, _] = useState<string>(WhiteBoardUtil.getLog());
 
   const resyncNeeded = useMemo(() => logs.indexOf('Must run --resync') > 0, [logs]);

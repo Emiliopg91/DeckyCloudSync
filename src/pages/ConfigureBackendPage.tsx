@@ -6,7 +6,7 @@ import {
   PanelSectionRow,
   showModal
 } from '@decky/ui';
-import { Translator } from 'decky-plugin-framework';
+import { Toast, Translator } from 'decky-plugin-framework';
 import { FC, useContext } from 'react';
 import { BsGearFill, BsPatchQuestionFill } from 'react-icons/bs';
 import { ImDropbox, ImGoogleDrive, ImHome, ImOnedrive } from 'react-icons/im';
@@ -14,7 +14,6 @@ import { ImDropbox, ImGoogleDrive, ImHome, ImOnedrive } from 'react-icons/im';
 import { GlobalContext } from '../contexts/globalContext';
 import { BackendUtils } from '../utils/backend';
 import { PluginSettings } from '../utils/pluginSettings';
-import { Toast } from '../utils/toast';
 import { WhiteBoardUtil } from '../utils/whiteboard';
 
 export const ConfigureBackendPage: FC = () => {

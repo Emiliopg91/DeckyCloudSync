@@ -18,7 +18,6 @@ import { WhiteBoardUtil } from '../utils/whiteboard';
 
 export const ConfigurePathPage: FC = () => {
   const [entry, setEntry] = useState(WhiteBoardUtil.getPathToEdit());
-  const [mode, setMode] = useState(0); //0 - All, 1 - only specified, 2 - all with exclusions
   const [homeDir, setHomeDir] = useState('');
   const [remoteDir, setRemoteDir] = useState('');
   const edit = useMemo<boolean>(() => entry != undefined, []);
@@ -160,13 +159,6 @@ export const ConfigurePathPage: FC = () => {
   useEffect((): (() => void) => {
     if (edit) {
       Logger.info('Starting edition of "' + entry!.name + '": ' + JSON.stringify(entry!.path));
-      if (entry!.path.exclusions!.length > 0) {
-        setMode(2);
-      } else {
-        if (entry!.path.inclusions!.length > 1 || entry?.path.inclusions![0] != '*') {
-          setMode(1);
-        }
-      }
     } else {
       Logger.info('Starting creation of new entry');
       setEntry({ name: '', path: { folder: '', inclusions: ['*'], exclusions: [] } });
