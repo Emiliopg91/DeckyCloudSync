@@ -5,11 +5,10 @@ import {
   Navigation,
   PanelSection,
   PanelSectionRow,
-  SimpleModal,
   showModal,
   sleep
 } from '@decky/ui';
-import { Backend, Logger, Translator } from 'decky-plugin-framework';
+import { Logger, Translator } from 'decky-plugin-framework';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { BackendUtils } from '../utils/backend';

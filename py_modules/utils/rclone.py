@@ -3,7 +3,7 @@ import asyncio
 from asyncio.subprocess import create_subprocess_exec, Process
 import decky
 import logger_utils
-import plugin_config
+from plugin_config import PluginConfig
 import os
 import os.path
 from glob import glob
@@ -30,7 +30,7 @@ class RCloneManager:
         for hgx in glob(decky.HOME + "/.cache/rclone/bisync/*.lck"):
             os.remove(hgx)
             
-        destination_path = plugin_config.get_config_item("settings.remote.directory", "decky-cloud-sync")
+        destination_path = PluginConfig.get_config_item("settings.remote.directory", "decky-cloud-sync")
         args = ["bisync", Constants.remote_dir, f"backend:{destination_path}", "--copy-links"]
 
         if mode == 0: 

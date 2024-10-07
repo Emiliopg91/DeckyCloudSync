@@ -9,7 +9,7 @@ import { ButtonWithIcon } from '../ui/buttonWithIcon';
 
 export const ConfigurationBlock: FC = () => {
   return (
-    <PanelSection title={Translator.translate('configuration')}>
+    <PanelSection>
       <PanelSectionRow>
         <ButtonWithIcon
           layout="below"

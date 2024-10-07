@@ -7,6 +7,7 @@ import {
 } from 'decky-plugin-framework';
 
 import { Path } from '../models/configuration';
+import { MenuEntry } from '../models/menuEntries';
 
 export class WhiteBoardUtil {
   public static getSyncInProgress(): boolean {
@@ -55,5 +56,26 @@ export class WhiteBoardUtil {
 
   public static setPathToEdit(value: { name: string; path: Path } | undefined): void {
     WhiteBoard.set('pathToEdit', value);
+  }
+
+  public static setIsConnected(value: boolean): void {
+    WhiteBoard.set('isConnected', value);
+  }
+
+  public static getIsConnected(): boolean {
+    const value = WhiteBoard.get<boolean>('isConnected');
+    return value != null ? value : true;
+  }
+
+  public static subscribeConnection(callback: (value: boolean) => void): () => void {
+    return WhiteBoardUtil.subscribe('isConnected', callback);
+  }
+
+  public static getMenuEntry(): MenuEntry {
+    return WhiteBoard.get('menuEntry') || MenuEntry.SYNC;
+  }
+
+  public static setMenuEntry(value: MenuEntry): void {
+    WhiteBoard.set('menuEntry', value);
   }
 }

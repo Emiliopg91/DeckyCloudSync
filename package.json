@@ -23,7 +23,6 @@
   "bugs": {
     "url": "https://github.com/Emiliopg91/decky-plugin-template/issues"
   },
-  "homepage": "https://github.com/Emiliopg91/decky-plugin-template#readme",
   "devDependencies": {
     "@decky/api": "^1.1.2",
     "@decky/rollup": "^1.0.1",

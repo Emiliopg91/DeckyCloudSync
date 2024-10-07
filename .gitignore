@@ -49,3 +49,5 @@ decky_plugin.py
 
 # Ignore decky CLI for building plugins
 out
+
+.eslintcache

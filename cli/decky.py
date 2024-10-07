@@ -5,6 +5,7 @@ from jobs.deployer import Deployer
 import sys
 import os
 import shutil
+from jobs.logger import LoggerOpener
 from jobs.utils import Utils
 from jobs.setup import Setup
 from jobs.translations import TranslationUpdater
@@ -34,6 +35,9 @@ class JobManager:
         
         if "deploy" in options:
             Deployer().deploy()
+        
+        if "logs" in options:
+            LoggerOpener().open()
 
 if __name__ == "__main__":
     options = sys.argv[1:]

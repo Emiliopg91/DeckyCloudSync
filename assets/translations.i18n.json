@@ -1,206 +1,250 @@
 {
-  "cancel": {
-    "en": "Cancel",
-    "es": "Cancelar"
-  },
-  "sync": {
-    "en": "Sync",
-    "es": "Sincronización"
-  },
-  "sync.now": {
-    "en": "Sync Now",
-    "es": "Sincronizar ahora"
-  },
-  "logs": {
-    "en": "Logs",
-    "es": "Registros"
-  },
-  "no.available.logs": {
-    "en": "No Available Logs",
-    "es": "No hay registros disponibles"
-  },
-  "app.logs": {
-    "en": "App Logs",
-    "es": "Registros de aplicación"
-  },
-  "sync.logs": {
-    "en": "Sync Logs",
-    "es": "Registros de sincronización"
-  },
-  "configuration": {
-    "en": "Configuration",
-    "es": "Configuración"
-  },
-  "configure.paths": {
-    "en": "Configure Paths",
-    "es": "Configurar rutas"
-  },
-  "cloud.provider": {
-    "en": "Cloud Provider",
-    "es": "Proveedor Cloud"
-  },
-  "provider.configured": {
-    "en": "Provider Configured",
-    "es": "Proveedor configurado"
-  },
-  "error.configuring.provider": {
-    "en": "Error Configuring Cloud Provider",
-    "es": "Error configurando proveedor Cloud"
-  },
-  "currently.using": {
-    "en": "Currently Using",
-    "es": "Actualmente usando"
-  },
-  "click.providers": {
-    "en": "Select an Option",
-    "es": "Seleccione una opción"
-  },
-  "resynchronizing.savedata": {
-    "en": "Resynchronizing Data",
-    "es": "Resincronizando datos"
-  },
-  "resync.now": {
-    "en": "Resync Now",
-    "es": "Resincronizar ahora"
-  },
-  "cloud.save.path": {
-    "en": "Cloud Save Path",
-    "es": "Ruta en el Cloud"
-  },
-  "sync.entries": {
-    "en": "Entries to Sync",
-    "es": "Entradas a sincronizar"
-  },
-  "add.entry": {
-    "en": "Add Entry",
-    "es": "Añadir entrada"
-  },
-  "edit.entry": {
-    "en": "Edit Entry",
-    "es": "Editar entrada"
-  },
-  "confirm.remove.entry": {
-    "en": "Do you want to remove the entry?",
-    "es": "¿Desea eliminar entrada?"
-  },
-  "description.remove.entry": {
-    "en": "If you remove an entry, it will stop syncing with the Cloud",
-    "es": "Si elimina una entrada, esta dejará de sincronizarse con el Cloud"
-  },
-  "remove.entry": {
-    "en": "Remove Entry",
-    "es": "Eliminar entrada"
-  },
-  "configuration.error": {
-    "en": "Configuration Error",
-    "es": "Error de configuración"
-  },
-  "remote.misplaced": {
-    "en": "The directory must be under {{remoteDir}}",
-    "es": "El directorio ha de encontrarse bajo {{remoteDir}}"
-  },
-  "try.again": {
-    "en": "Try Again",
-    "es": "Intentar de nuevo"
-  },
-  "remote.select.subfolder": {
-    "en": "The directory cannot be the same as {{remoteDir}}",
-    "es": "El directorio no puede ser igual a {{remoteDir}}"
-  },
-  "folder.already.in.use": {
-    "en": "The directory is already in use",
-    "es": "El directorio ya se encuentra en uso"
-  },
-  "local.include.remote": {
-    "en": "The local path cannot include the remote path {{remoteDir}}",
-    "es": "La ruta local no puede incluir a la ruta remota {{remoteDir}}"
-  },
-  "cannot.select.root": {
-    "en": "Cannot select the root of the system as a folder to sync",
-    "es": "No se puede elegir la raiz del sistema como carpeta a sincronizar"
-  },
-  "must.be.in.local": {
-    "en": "The selected path must be under {{path}}",
-    "es": "La ruta seleccionada no se encuentra bajo {{path}}"
-  },
-  "manage.entry": {
-    "en": "Manage Entry",
-    "es": "Gestionar entrada"
-  },
-  "entry.remote.folder": {
-    "en": "Remote Folder",
-    "es": "Carpeta remota"
-  },
-  "explore": {
-    "en": "Explore",
-    "es": "Explorar"
-  },
-  "entry.local.folder": {
-    "en": "Local Folder",
-    "es": "Carpeta local"
-  },
-  "include": {
-    "en": "Include",
-    "es": "Incluir"
-  },
-  "all.files": {
-    "en": "All Files and Directories",
-    "es": "Todos los archivos y directorios"
-  },
-  "remove": {
-    "en": "Remove",
-    "es": "Eliminar"
-  },
-  "add.file": {
-    "en": "Add File",
-    "es": "Añadir archivo"
-  },
-  "add.folder": {
-    "en": "Add Folder",
-    "es": "Añadir carpeta"
-  },
-  "exclude": {
-    "en": "Exclude",
-    "es": "Excluir"
-  },
-  "save": {
-    "en": "Save",
-    "es": "Guardar"
-  },
-  "sync.failed": {
-    "en": "Sync Error",
-    "es": "Error de sincronización"
-  },
-  "sync.succesful": {
-    "en": "Sync completed in {{time}}",
-    "es": "Sincronización finalizada en {{time}}"
-  },
-  "synchronizing.savedata": {
-    "en": "Synchronizing Data",
-    "es": "Sincronizando datos"
-  },
-  "waiting.previous.sync": {
-    "en": "Waiting for previous sync",
-    "es": "Esperando sincronización anterior"
-  },
-  "forcing.sync": {
-    "en": "Forcing sync",
-    "es": "Forzando sincronización"
-  },
-  "force.now": {
-    "en": "Force now",
-    "es": "Forzar ahora"
-  },
-  "other.providers": {
-    "en": "",
-    "es": ""
-  },
-  "manually.desktop": {
-    "en": "",
-    "es": ""
-  },
-  "other.advanced": {
-    "en": "",
-    "es": ""
-  }
+    "cancel": {
+        "en": "Cancel",
+        "es": "Cancelar"
+    },
+    "sync": {
+        "en": "Sync",
+        "es": "Sincronización"
+    },
+    "sync.now": {
+        "en": "Sync Now",
+        "es": "Sincronizar ahora"
+    },
+    "logs": {
+        "en": "Logs",
+        "es": "Registros"
+    },
+    "no.available.logs": {
+        "en": "No Available Logs",
+        "es": "No hay registros disponibles"
+    },
+    "app.logs": {
+        "en": "App Logs",
+        "es": "Logs de plugin"
+    },
+    "sync.logs": {
+        "en": "Sync Logs",
+        "es": "Logs de sincronización"
+    },
+    "configuration": {
+        "en": "Configuration",
+        "es": "Configuración"
+    },
+    "configure.paths": {
+        "en": "Configure Paths",
+        "es": "Configurar rutas"
+    },
+    "cloud.provider": {
+        "en": "Cloud Provider",
+        "es": "Proveedor Cloud"
+    },
+    "provider.configured": {
+        "en": "Provider Configured",
+        "es": "Proveedor configurado"
+    },
+    "error.configuring.provider": {
+        "en": "Error Configuring Cloud Provider",
+        "es": "Error configurando proveedor Cloud"
+    },
+    "currently.using": {
+        "en": "Currently Using",
+        "es": "Actualmente usando"
+    },
+    "click.providers": {
+        "en": "Select an Option",
+        "es": "Seleccione una opción"
+    },
+    "resynchronizing.savedata": {
+        "en": "Resynchronizing Data",
+        "es": "Resincronizando datos"
+    },
+    "resync.now": {
+        "en": "Resync Now",
+        "es": "Resincronizar ahora"
+    },
+    "cloud.save.path": {
+        "en": "Cloud Save Path",
+        "es": "Ruta en el Cloud"
+    },
+    "sync.entries": {
+        "en": "Entries to Sync",
+        "es": "Entradas a sincronizar"
+    },
+    "add.entry": {
+        "en": "Add Entry",
+        "es": "Añadir entrada"
+    },
+    "edit.entry": {
+        "en": "Edit Entry",
+        "es": "Editar entrada"
+    },
+    "confirm.remove.entry": {
+        "en": "Do you want to remove the entry?",
+        "es": "¿Desea eliminar entrada?"
+    },
+    "description.remove.entry": {
+        "en": "If you remove an entry, it will stop syncing with the Cloud",
+        "es": "Si elimina una entrada, esta dejará de sincronizarse con el Cloud"
+    },
+    "remove.entry": {
+        "en": "Remove Entry",
+        "es": "Eliminar entrada"
+    },
+    "configuration.error": {
+        "en": "Configuration Error",
+        "es": "Error de configuración"
+    },
+    "remote.misplaced": {
+        "en": "The directory must be under {{remoteDir}}",
+        "es": "El directorio ha de encontrarse bajo {{remoteDir}}"
+    },
+    "try.again": {
+        "en": "Try Again",
+        "es": "Intentar de nuevo"
+    },
+    "remote.select.subfolder": {
+        "en": "The directory cannot be the same as {{remoteDir}}",
+        "es": "El directorio no puede ser igual a {{remoteDir}}"
+    },
+    "folder.already.in.use": {
+        "en": "The directory is already in use",
+        "es": "El directorio ya se encuentra en uso"
+    },
+    "local.include.remote": {
+        "en": "The local path cannot include the remote path {{remoteDir}}",
+        "es": "La ruta local no puede incluir a la ruta remota {{remoteDir}}"
+    },
+    "cannot.select.root": {
+        "en": "Cannot select the root of the system as a folder to sync",
+        "es": "No se puede elegir la raiz del sistema como carpeta a sincronizar"
+    },
+    "must.be.in.local": {
+        "en": "The selected path must be under {{path}}",
+        "es": "La ruta seleccionada no se encuentra bajo {{path}}"
+    },
+    "manage.entry": {
+        "en": "Manage Entry",
+        "es": "Gestionar entrada"
+    },
+    "entry.remote.folder": {
+        "en": "Remote Folder",
+        "es": "Carpeta remota"
+    },
+    "explore": {
+        "en": "Explore",
+        "es": "Explorar"
+    },
+    "entry.local.folder": {
+        "en": "Local Folder",
+        "es": "Carpeta local"
+    },
+    "include": {
+        "en": "Include",
+        "es": "Incluir"
+    },
+    "all.files": {
+        "en": "All Files and Directories",
+        "es": "Todos los archivos y directorios"
+    },
+    "remove": {
+        "en": "Remove",
+        "es": "Eliminar"
+    },
+    "add.file": {
+        "en": "Add File",
+        "es": "Añadir archivo"
+    },
+    "add.folder": {
+        "en": "Add Folder",
+        "es": "Añadir carpeta"
+    },
+    "exclude": {
+        "en": "Exclude",
+        "es": "Excluir"
+    },
+    "save": {
+        "en": "Save",
+        "es": "Guardar"
+    },
+    "sync.failed": {
+        "en": "Sync Error",
+        "es": "Error de sincronización"
+    },
+    "sync.succesful": {
+        "en": "Sync completed in {{time}}",
+        "es": "Sincronización finalizada en {{time}}"
+    },
+    "synchronizing.savedata": {
+        "en": "Synchronizing Data",
+        "es": "Sincronizando datos"
+    },
+    "waiting.previous.sync": {
+        "en": "Waiting for previous sync",
+        "es": "Esperando sincronización anterior"
+    },
+    "forcing.sync": {
+        "en": "Forcing sync",
+        "es": "Forzando sincronización"
+    },
+    "force.now": {
+        "en": "Force now",
+        "es": "Forzar ahora"
+    },
+    "no.connection": {
+        "en": "No active network connection",
+        "es": "Sin conexión de red activa"
+    },
+    "no.connection.desc": {
+        "en": "Unable to sync files to the Cloud. If changes are saved locally and conflict with files in the Cloud, data loss may occur.",
+        "es": "No se puede sincronizar archivos con el Cloud. Si se guardan cambios localmente y entran en conflicto con los archivos del Cloud, puede haber pérdida de datos."
+    },
+    "run.anyway": {
+        "en": "Run anyway",
+        "es": "Ejecutar de todos modos"
+    },
+    "stop.app": {
+        "en": "Stop application",
+        "es": "Detener aplicación"
+    },
+    "no.provider": {
+        "en": "No provider defined",
+        "es": "Sin proveedor establecido"
+    },
+    "menu.sync": {
+        "en": "Synchronization",
+        "es": "Sincronizacion"
+    },
+    "menu.logs": {
+        "en": "Logs",
+        "es": "Registros"
+    },
+    "menu.plugin": {
+        "en": "Plugin",
+        "es": "Plugin"
+    },
+    "contribute.info": {
+        "en": "Contribute",
+        "es": "Contribuye"
+    },
+    "make.a.donation": {
+        "en": "Make a donation",
+        "es": "Haz una donación"
+    },
+    "report.a.bug": {
+        "en": "Report bug",
+        "es": "Reportar error"
+    },
+    "other.providers": {
+        "en": "",
+        "es": ""
+    },
+    "manually.desktop": {
+        "en": "",
+        "es": ""
+    },
+    "other.advanced": {
+        "en": "",
+        "es": ""
+    }
 }

@@ -16,7 +16,7 @@ export const LogsBlock: FC = () => {
   return (
     <>
       <>
-        <PanelSection title={Translator.translate('logs')}>
+        <PanelSection>
           <PanelSectionRow>
             <ButtonWithIcon
               layout="below"

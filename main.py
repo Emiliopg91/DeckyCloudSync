@@ -4,7 +4,8 @@ import os
 # For easy intellisense checkout the decky-loader code one directory up
 # or add the `decky-loader/plugin` path to `python.analysis.extraPaths` in `.vscode/settings.json`
 import decky
-import plugin_config
+from plugin_config import PluginConfig
+from plugin_update import PluginUpdate
 import logger_utils
 import signal
 from utils.rclone import RCloneManager
@@ -17,13 +18,13 @@ class Plugin:
     
 # Configuration
     async def get_config(self):
-        return plugin_config.get_config()
+        return PluginConfig.get_config()
 
     async def set_config(self, key: str, value):
-        plugin_config.set_config(key, value)
+        PluginConfig.set_config(key, value)
 
     async def delete_config(self, key: str):
-        plugin_config.delete_config(key)
+        PluginConfig.delete_config(key)
 
 # Logger
 
@@ -41,7 +42,7 @@ class Plugin:
 
     async def _migration(self):
         decky.logger.info("Migrating plugin configuration")
-        plugin_config.migrate()
+        PluginConfig.migrate()
 
 # RClone
 
@@ -84,3 +85,13 @@ class Plugin:
     
     async def get_remote_dir(self) -> str:
         return Constants.remote_dir
+    
+#Plugin update
+    async def ota_update(self):
+        decky.logger.debug("Executing: ota_update()")
+        # trigger ota update
+        try:
+            return PluginUpdate.ota_update()
+        except Exception as e:
+            decky.logger.error(e)
+            return False

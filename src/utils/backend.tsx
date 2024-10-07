@@ -1,11 +1,10 @@
-import { Navigation, sleep } from '@decky/ui';
+import { ConfirmModal, showModal, sleep } from '@decky/ui';
 import { Mutex } from 'async-mutex';
 import { Backend, Logger, Translator } from 'decky-plugin-framework';
 
 import { Signal } from '../models/signals';
 import { SyncMode } from '../models/syncModes';
 import { Winner } from '../models/winners';
-import { Constants } from './constants';
 import { NavigationUtil } from './navigation';
 import { Toast } from './toast';
 import { WhiteBoardUtil } from './whiteboard';
@@ -56,50 +55,57 @@ export class BackendUtils {
   }
 
   public static async doSynchronization(winner: Winner, mode: SyncMode): Promise<void> {
+    if (BackendUtils.SYNC_MUTEX.isLocked()) {
+      Toast.toast(Translator.translate('waiting.previous.sync'));
+    }
     return new Promise<void>((resolve) => {
-      if (BackendUtils.SYNC_MUTEX.isLocked()) {
-        Toast.toast(Translator.translate('waiting.previous.sync'));
-      }
       BackendUtils.SYNC_MUTEX.acquire().then(async (release) => {
-        switch (mode) {
-          case SyncMode.NORMAL:
-            Toast.toast(Translator.translate('synchronizing.savedata'));
-            break;
-          case SyncMode.RESYNC:
-            Toast.toast(Translator.translate('resynchronizing.savedata'));
-            break;
-          case SyncMode.FORCE:
-            Toast.toast(Translator.translate('forcing.sync'));
-            break;
-        }
         Logger.info('=== STARTING SYNC ===');
-        const t0 = Date.now();
         WhiteBoardUtil.setSyncInProgress(true);
-        try {
-          await BackendUtils.fsSync(true);
+        if (WhiteBoardUtil.getIsConnected()) {
+          switch (mode) {
+            case SyncMode.NORMAL:
+              Toast.toast(Translator.translate('synchronizing.savedata'));
+              break;
+            case SyncMode.RESYNC:
+              Toast.toast(Translator.translate('resynchronizing.savedata'));
+              break;
+            case SyncMode.FORCE:
+              Toast.toast(Translator.translate('forcing.sync'));
+              break;
+          }
+          const t0 = Date.now();
+          try {
+            await BackendUtils.fsSync(true);
 
-          await BackendUtils.rcloneSync(winner, mode);
-          let returnCode = -2;
-          do {
-            await sleep(200);
-            returnCode = await BackendUtils.checkStatus();
-          } while (returnCode < 0);
+            await BackendUtils.rcloneSync(winner, mode);
+            let returnCode = -2;
+            do {
+              await sleep(200);
+              returnCode = await BackendUtils.checkStatus();
+            } while (returnCode < 0);
 
-          if (returnCode != 0) {
+            if (returnCode != 0) {
+              Toast.toast(Translator.translate('sync.failed'), 5000, () => {
+                NavigationUtil.openLogPage(true);
+              });
+              WhiteBoardUtil.setSyncInProgress(false);
+              Logger.info('=== FINISHING SYNC ===');
+              release();
+              resolve();
+              return;
+            }
+
+            await BackendUtils.fsSync(false);
+            Toast.toast(Translator.translate('sync.succesful', { time: (Date.now() - t0) / 1000 }));
+          } catch (e) {
+            Logger.error('Sync exception', e);
             Toast.toast(Translator.translate('sync.failed'), 5000, () => {
               NavigationUtil.openLogPage(true);
             });
-            WhiteBoardUtil.setSyncInProgress(false);
-            Logger.info('=== FINISHING SYNC ===');
-            release();
-            resolve();
-            return;
           }
-
-          await BackendUtils.fsSync(false);
-          Toast.toast(Translator.translate('sync.succesful', { time: (Date.now() - t0) / 1000 }));
-        } catch (e) {
-          Logger.error('Sync exception', e);
+        } else {
+          Logger.info('No network connection. Stopping sync');
           Toast.toast(Translator.translate('sync.failed'), 5000, () => {
             NavigationUtil.openLogPage(true);
           });
@@ -115,12 +121,32 @@ export class BackendUtils {
   public static async doSynchronizationForGame(onStart: boolean, pid: number): Promise<void> {
     if (onStart) {
       await BackendUtils.sendSignal(pid, Signal.SIGSTOP);
-    }
 
-    await BackendUtils.doSynchronization(onStart ? Winner.REMOTE : Winner.LOCAL, SyncMode.NORMAL);
+      if (WhiteBoardUtil.getIsConnected()) {
+        await BackendUtils.doSynchronization(
+          onStart ? Winner.REMOTE : Winner.LOCAL,
+          SyncMode.NORMAL
+        );
 
-    if (onStart) {
-      await BackendUtils.sendSignal(pid, Signal.SIGCONT);
+        await BackendUtils.sendSignal(pid, Signal.SIGCONT);
+      } else {
+        showModal(
+          <ConfirmModal
+            strTitle={Translator.translate('no.connection')}
+            strDescription={Translator.translate('no.connection.desc')}
+            strOKButtonText={Translator.translate('stop.app')}
+            strCancelButtonText={Translator.translate('run.anyway')}
+            onOK={async () => {
+              await BackendUtils.sendSignal(pid, Signal.SIGKILL);
+            }}
+            onCancel={async () => {
+              await BackendUtils.sendSignal(pid, Signal.SIGCONT);
+            }}
+          />
+        );
+      }
+    } else {
+      await BackendUtils.doSynchronization(onStart ? Winner.REMOTE : Winner.LOCAL, SyncMode.NORMAL);
     }
   }
 

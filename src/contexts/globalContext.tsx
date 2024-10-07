@@ -1,3 +1,11 @@
+import {
+  EventBus,
+  EventData,
+  EventType,
+  Logger,
+  NetworkEventData,
+  System
+} from 'decky-plugin-framework';
 import { createContext, useEffect, useState } from 'react';
 
 import { WhiteBoardUtil } from '../utils/whiteboard';
@@ -5,11 +13,13 @@ import { WhiteBoardUtil } from '../utils/whiteboard';
 interface GlobalContextType {
   syncInProgress: boolean;
   provider: string | undefined;
+  connected: boolean;
 }
 
 const defaultValue: GlobalContextType = {
   syncInProgress: false,
-  provider: undefined
+  provider: undefined,
+  connected: false
 };
 
 export const GlobalContext = createContext(defaultValue);
@@ -17,6 +27,7 @@ export const GlobalContext = createContext(defaultValue);
 export function GlobalProvider({ children }: { children: JSX.Element }): JSX.Element {
   const [syncInProgress, setSyncInProgress] = useState(WhiteBoardUtil.getSyncInProgress());
   const [provider, setProvider] = useState(WhiteBoardUtil.getProvider());
+  const [connected, setConnected] = useState(WhiteBoardUtil.getIsConnected());
 
   useEffect(() => {
     const unsSync = WhiteBoardUtil.subscribeSyncInProgress((value: boolean) => {
@@ -25,14 +36,20 @@ export function GlobalProvider({ children }: { children: JSX.Element }): JSX.Ele
     const unsProv = WhiteBoardUtil.subscribeProvider((value: string) => {
       setProvider(value);
     });
+    const unsNet = WhiteBoardUtil.subscribeConnection((value: boolean) => {
+      setConnected(value);
+    });
 
     return (): void => {
       unsSync();
       unsProv();
+      unsNet();
     };
   }, []);
 
   return (
-    <GlobalContext.Provider value={{ syncInProgress, provider }}>{children}</GlobalContext.Provider>
+    <GlobalContext.Provider value={{ syncInProgress, provider, connected }}>
+      {children}
+    </GlobalContext.Provider>
   );
 }
