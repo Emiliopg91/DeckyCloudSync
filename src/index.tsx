@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import { definePlugin, routerHook } from '@decky/api';
-import { staticClasses } from '@decky/ui';
-import { Framework } from 'decky-plugin-framework';
+import { sleep, staticClasses } from '@decky/ui';
+import { Framework, Logger, Toast, Translator } from 'decky-plugin-framework';
 
 import translations from '../assets/translations.i18n.json';
+import pckJson from '../package.json';
 import { PluginIcon } from './components/icons/PluginIcon';
 import { GlobalProvider } from './contexts/globalContext';
 import { ConfigureBackendPage } from './pages/ConfigureBackendPage';
@@ -11,10 +12,47 @@ import { ConfigurePathPage } from './pages/ConfigurePathPage';
 import { ConfigurePathsPage } from './pages/ConfigurePathsPage';
 import { QuickAccessMenuPage } from './pages/QuickAccessMenuPage';
 import { ViewLogsPage } from './pages/ViewLogsPage';
+import { BackendUtils } from './utils/backend';
 import { Constants } from './utils/constants';
 import { PluginSettings } from './utils/pluginSettings';
 import { SteamListeners } from './utils/steamListeners';
 import { WhiteBoardUtil } from './utils/whiteboard';
+
+let pluginUpdateCheckTimer: NodeJS.Timeout | undefined;
+
+const checkPluginLatestVersion = async (): Promise<void> => {
+  try {
+    Logger.info('Checking for plugin update');
+
+    const result = await fetch(
+      'https://raw.githubusercontent.com/' +
+        pckJson.author +
+        '/' +
+        Constants.PLUGIN_NAME +
+        '/main/package.json',
+      { method: 'GET' }
+    );
+
+    if (!result.ok) {
+      throw new Error(result.statusText);
+    }
+
+    const vers = (await result.json())['version'];
+    Logger.info('Latest plugin version: ' + vers);
+    if (vers != WhiteBoardUtil.getPluginLatestVersion() && Constants.PLUGIN_VERSION != vers) {
+      Logger.info('New plugin update available!');
+      Toast.toast(Translator.translate('update.available'), 5000, () => {
+        BackendUtils.otaUpdate();
+      });
+      clearInterval(pluginUpdateCheckTimer);
+      pluginUpdateCheckTimer = undefined;
+    }
+    WhiteBoardUtil.setPluginLatestVersion(vers);
+  } catch (e) {
+    Logger.error('Error fetching latest plugin version', e);
+    WhiteBoardUtil.setPluginLatestVersion('');
+  }
+};
 
 export default definePlugin(() => {
   (async (): Promise<void> => {
@@ -37,6 +75,11 @@ export default definePlugin(() => {
     });
     routerHook.addRoute(Constants.PATH_CONFIGURE_PROVIDER, () => <ConfigureBackendPage />, {
       exact: true
+    });
+
+    sleep(10000).then(() => {
+      pluginUpdateCheckTimer = setInterval(checkPluginLatestVersion, 60 * 60 * 1000);
+      checkPluginLatestVersion();
     });
   })();
 

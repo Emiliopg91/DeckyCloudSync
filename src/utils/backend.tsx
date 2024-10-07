@@ -153,4 +153,15 @@ export class BackendUtils {
   private static async checkStatus(): Promise<number> {
     return Backend.backend_call<[], number>('check_status');
   }
+
+  public static async otaUpdate(): Promise<void> {
+    Logger.info(
+      'Download and installation of version ' +
+        WhiteBoardUtil.getPluginLatestVersion() +
+        ' in progress'
+    );
+    Backend.backend_call<[], boolean>('ota_update').then(() => {
+      SteamClient.System.RestartPC();
+    });
+  }
 }

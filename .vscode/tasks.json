@@ -31,16 +31,17 @@
         ]
       }
     },
-    {
-      "label": "logs",
-      "detail": "Open remote plugin log",
-      "linux": {
-        "command": "${workspaceFolder}/cli/decky.py",
-        "args": [
-          "logs"
-        ]
-      }
-    },
+      {
+        "label": "logs",
+        "detail": "Open remote plugin log",
+        "linux": {
+          "command": "${workspaceFolder}/cli/decky.py",
+          "args": [
+            "logs"
+          ]
+        },
+        "problemMatcher": []
+      },
     {
       "label": "build-deploy",
       "detail": "Build and deploy plugin",
@@ -50,7 +51,8 @@
           "build",
           "deploy"
         ]
-      }
+      },
+      "problemMatcher": []
     }
   ]
 }
