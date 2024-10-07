@@ -77,9 +77,11 @@ export default definePlugin(() => {
       exact: true
     });
 
-    sleep(10000).then(() => {
-      pluginUpdateCheckTimer = setInterval(checkPluginLatestVersion, 60 * 60 * 1000);
-      checkPluginLatestVersion();
+    sleep(5000).then(() => {
+      if (!Constants.PLUGIN_VERSION.endsWith('dev')) {
+        pluginUpdateCheckTimer = setInterval(checkPluginLatestVersion, 60 * 60 * 1000);
+        checkPluginLatestVersion();
+      }
     });
   })();
 
