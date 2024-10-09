@@ -274,5 +274,25 @@
   "update.available": {
     "en": "Update available. Click to install",
     "es": "Actualización disponible. Pulse para instalar"
+  },
+  "confirm.copy.entry": {
+    "en": "Copy remote files?",
+    "es": "¿Copiar archivos remotos?"
+  },
+  "description.copy.entry": {
+    "en": "Remote files will be copied to the local folder. Local files will be overwritten and any unsynced changes will be lost.",
+    "es": "Se copiarán los archivos remotos a la carpeta local. Se sobreescribirán los archivos locales y se perderá cualquier cambio no sincronizado"
+  },
+  "copy.entry": {
+    "en": "Copy files",
+    "es": "Copiar archivos"
+  },
+  "copied.files": {
+    "en": "Copied {{count}} files",
+    "es": "Copiados {{count}} archivos"
+  },
+  "error.copying.files": {
+    "en": "Error copying files",
+    "es": "Error copiando archivos"
   }
 }

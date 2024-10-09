@@ -53,12 +53,13 @@ export class BackendUtils {
     return Backend.backend_call<[], string>('get_remote_dir');
   }
 
-  public static async doSynchronization(winner: Winner, mode: SyncMode): Promise<void> {
+  public static async doSynchronization(winner: Winner, mode: SyncMode): Promise<boolean> {
     if (BackendUtils.SYNC_MUTEX.isLocked()) {
       Toast.toast(Translator.translate('waiting.previous.sync'));
     }
-    return new Promise<void>((resolve) => {
+    return new Promise<boolean>((resolve) => {
       BackendUtils.SYNC_MUTEX.acquire().then(async (release) => {
+        let result = true;
         Logger.info('=== STARTING SYNC ===');
         WhiteBoardUtil.setSyncInProgress(true);
         if (WhiteBoardUtil.getIsConnected()) {
@@ -91,11 +92,12 @@ export class BackendUtils {
               WhiteBoardUtil.setSyncInProgress(false);
               Logger.info('=== FINISHING SYNC ===');
               release();
-              resolve();
+              resolve(false);
               return;
             }
 
             await BackendUtils.fsSync(false);
+            result = true;
             Toast.toast(
               Translator.translate('sync.succesful', { time: (Date.now() - t0) / 1000 }),
               2000,
@@ -105,12 +107,14 @@ export class BackendUtils {
             );
           } catch (e) {
             Logger.error('Sync exception', e);
+            result = false;
             Toast.toast(Translator.translate('sync.failed'), 5000, () => {
               NavigationUtil.openLogPage(true);
             });
           }
         } else {
           Logger.info('No network connection. Stopping sync');
+          result = false;
           Toast.toast(Translator.translate('sync.failed'), 5000, () => {
             NavigationUtil.openLogPage(true);
           });
@@ -118,7 +122,7 @@ export class BackendUtils {
         Logger.info('=== FINISHING SYNC ===');
         WhiteBoardUtil.setSyncInProgress(false);
         release();
-        resolve();
+        resolve(result);
       });
     });
   }
@@ -153,6 +157,27 @@ export class BackendUtils {
     } else {
       await BackendUtils.doSynchronization(onStart ? Winner.REMOTE : Winner.LOCAL, SyncMode.NORMAL);
     }
+  }
+
+  public static async copyToLocal(key: string): Promise<void> {
+    if (BackendUtils.SYNC_MUTEX.isLocked()) {
+      Toast.toast(Translator.translate('waiting.previous.sync'));
+    }
+    return new Promise<void>((resolve) => {
+      BackendUtils.SYNC_MUTEX.acquire().then(async (release) => {
+        Backend.backend_call<[key: string], number>('copy_to_local', key)
+          .then((count) => {
+            Toast.toast(Translator.translate('copied.files', { count }));
+            release();
+            resolve();
+          })
+          .catch(() => {
+            Toast.toast(Translator.translate('error.copying.files'));
+            release();
+            resolve();
+          });
+      });
+    });
   }
 
   private static async checkStatus(): Promise<number> {
