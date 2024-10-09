@@ -62,6 +62,9 @@ class Plugin:
             FsSync.copyToRemote()
         else:
             FsSync.copyFromRemote()
+
+    async def copy_to_local(self, dir:str) -> int:
+        return FsSync.copyFolderToLocal(dir)
         
 # Processes
 

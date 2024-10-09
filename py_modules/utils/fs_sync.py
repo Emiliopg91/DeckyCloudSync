@@ -227,3 +227,52 @@ class FsSync:
 
         return files_to_copy
     
+
+    def copyFolderToLocal(dir:str) -> int:
+        decky.logger.info("")
+        decky.logger.info(f"Copying {dir} to local")
+
+        copied_files = 0
+        total_size = 0  # Variable to accumulate the total size of copied files
+
+        start_time = time.time()  # Record start time
+
+        # Read the JSON configuration file
+        data = FsSync.read_json(Constants.plugin_settings)["entries"]
+        
+        # Process each entry in the JSON
+        for entry_name, details in sorted(data.items()):
+            if entry_name == dir:
+                src_path = Constants.remote_dir + "/" + entry_name
+                dst_path = details['folder']
+                decky.logger.info(f"  Destination folder: {dst_path}")
+
+                for root, dirs, files in os.walk(src_path):
+                    dirs.sort()
+                    files = sorted(files)
+                    relative_path = os.path.relpath(root, src_path)
+                    dest_dir = os.path.join(dst_path, relative_path)
+
+                    if not os.path.exists(dest_dir):
+                        os.makedirs(dest_dir)
+
+                    for file in files:
+                        src_file = os.path.join(root, file)
+                        dest_file = os.path.join(dest_dir, file).replace("/./","/")
+                        FsSync.copy_with_timestamps(src_file, dest_file)
+                        copied_files += 1
+                        total_size += os.path.getsize(dest_file)
+                        decky.logger.info(f"    Copied ./{os.path.relpath(src_file, src_path)}")
+
+        end_time = time.time()  # Record end time
+        elapsed_time = end_time - start_time  # Calculate elapsed time
+        display_time = round(elapsed_time*1000)/1000
+
+        # Calculate speed
+        speed = total_size / elapsed_time if elapsed_time > 0 else 0
+
+        decky.logger.info("")
+        decky.logger.info(f"Copied {copied_files} files, {FsSync.format_size(total_size)} in {display_time} seconds ({FsSync.format_speed(speed)})")
+        decky.logger.info("")
+
+        return copied_files

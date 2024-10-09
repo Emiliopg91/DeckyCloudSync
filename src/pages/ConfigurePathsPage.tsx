@@ -9,10 +9,12 @@ import {
 } from '@decky/ui';
 import { Translator } from 'decky-plugin-framework';
 import { debounce } from 'lodash';
-import { FC, useCallback, useState } from 'react';
-import { FaPen, FaTrash } from 'react-icons/fa';
+import { FC, useCallback, useContext, useState } from 'react';
+import { FaCopy, FaPen, FaTrash } from 'react-icons/fa';
 
 import { ButtonWithIcon } from '../components/ui/buttonWithIcon';
+import { GlobalContext } from '../contexts/globalContext';
+import { BackendUtils } from '../utils/backend';
 import { Constants } from '../utils/constants';
 import { PluginSettings } from '../utils/pluginSettings';
 import { WhiteBoardUtil } from '../utils/whiteboard';
@@ -22,14 +24,20 @@ const saveDirectory = debounce((newVal: string): void => {
 }, 1000);
 
 export const ConfigurePathsPage: FC = () => {
+  const { syncInProgress } = useContext(GlobalContext);
+
   const [remoteDir, setRemoteDir] = useState(PluginSettings.getRemoteDirectory());
   const [entries, setEntries] = useState(PluginSettings.getEntries());
+
   const onDirChange = useCallback((newVal: string): void => {
     setRemoteDir(() => newVal);
     saveDirectory(newVal);
   }, []);
   const onDeleteEntry = useCallback((key: string): void => {
     setEntries(PluginSettings.removeEntry(key));
+  }, []);
+  const onCopyEntry = useCallback((key: string): void => {
+    BackendUtils.copyToLocal(key);
   }, []);
 
   return (
@@ -46,6 +54,7 @@ export const ConfigurePathsPage: FC = () => {
         <div style={{ paddingLeft: '10px' }}>
           <PanelSectionRow>
             <ButtonItem
+              disabled={syncInProgress}
               layout="below"
               onClick={() => {
                 WhiteBoardUtil.setPathToEdit(undefined);
@@ -65,6 +74,7 @@ export const ConfigurePathsPage: FC = () => {
                       <td>{key}</td>
                       <td>
                         <ButtonWithIcon
+                          disabled={syncInProgress}
                           icon={<FaPen />}
                           onClick={() => {
                             WhiteBoardUtil.setPathToEdit({ name: key, path: entries[key] });
@@ -76,6 +86,7 @@ export const ConfigurePathsPage: FC = () => {
                       </td>
                       <td>
                         <ButtonWithIcon
+                          disabled={syncInProgress}
                           icon={<FaTrash />}
                           onClick={() => {
                             showModal(
@@ -92,6 +103,27 @@ export const ConfigurePathsPage: FC = () => {
                           }}
                         >
                           {Translator.translate('remove.entry')}
+                        </ButtonWithIcon>
+                      </td>
+                      <td>
+                        <ButtonWithIcon
+                          disabled={syncInProgress}
+                          icon={<FaCopy />}
+                          onClick={() => {
+                            showModal(
+                              <ConfirmModal
+                                strTitle={Translator.translate('confirm.copy.entry')}
+                                strDescription={Translator.translate('description.copy.entry')}
+                                strOKButtonText={Translator.translate('copy.entry')}
+                                strCancelButtonText={Translator.translate('cancel')}
+                                onOK={() => {
+                                  onCopyEntry(key);
+                                }}
+                              />
+                            );
+                          }}
+                        >
+                          {Translator.translate('copy.entry')}
                         </ButtonWithIcon>
                       </td>
                     </tr>

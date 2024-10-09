@@ -45,6 +45,17 @@
       "problemMatcher": []
     },
     {
+      "label": "translations",
+      "detail": "Add missing translations",
+      "linux": {
+        "command": "${workspaceFolder}/cli/decky.py",
+        "args": [
+          "translations"
+        ]
+      },
+      "problemMatcher": []
+    },
+    {
       "label": "build-deploy",
       "detail": "Build and deploy plugin",
       "linux": {
