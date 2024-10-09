@@ -12,7 +12,6 @@ import { ConfigurePathPage } from './pages/ConfigurePathPage';
 import { ConfigurePathsPage } from './pages/ConfigurePathsPage';
 import { QuickAccessMenuPage } from './pages/QuickAccessMenuPage';
 import { ViewLogsPage } from './pages/ViewLogsPage';
-import { BackendUtils } from './utils/backend';
 import { Constants } from './utils/constants';
 import { PluginSettings } from './utils/pluginSettings';
 import { SteamListeners } from './utils/steamListeners';
@@ -41,9 +40,12 @@ const checkPluginLatestVersion = async (): Promise<void> => {
     Logger.info('Latest plugin version: ' + vers);
     if (vers != WhiteBoardUtil.getPluginLatestVersion() && Constants.PLUGIN_VERSION != vers) {
       Logger.info('New plugin update available!');
-      Toast.toast(Translator.translate('update.available'), 5000, () => {
+      Toast.toast(
+        Translator.translate('update.available'),
+        5000 /*, () => {
         BackendUtils.otaUpdate();
-      });
+      }*/
+      );
       clearInterval(pluginUpdateCheckTimer);
       pluginUpdateCheckTimer = undefined;
     }
