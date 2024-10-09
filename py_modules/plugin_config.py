@@ -140,6 +140,6 @@ class PluginConfig:
         return {
             "repoUrl":     f"https://github.com/{package_json_data['author']}/{decky.DECKY_PLUGIN_NAME}",
             "issuesUrl":   f"https://github.com/{package_json_data['author']}/{decky.DECKY_PLUGIN_NAME}/issues",
-            "releasesUrl": f"https://github.com/{package_json_data['author']}/{decky.DECKY_PLUGIN_NAME}/releases/latest"
+            "releasesUrl": f"http://api.github.com/repos/{package_json_data['author']}/{decky.DECKY_PLUGIN_NAME}/releases/latest"
         }
         
