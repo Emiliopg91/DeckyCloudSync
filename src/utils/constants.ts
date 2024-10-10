@@ -13,4 +13,6 @@ export class Constants {
 
   public static PATH_SYNC_LOG = Constants.PATH_BASE + 'sync-log';
   public static PATH_PLUGIN_LOG = Constants.PATH_BASE + 'plugin-log';
+
+  public static PATH_SUDO_PASSWORD = Constants.PATH_BASE + 'sudo-password';
 }

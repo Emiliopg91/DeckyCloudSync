@@ -184,13 +184,17 @@ export class BackendUtils {
     return Backend.backend_call<[], number>('check_status');
   }
 
-  public static async otaUpdate(): Promise<void> {
+  public static async otaUpdate(_sudoPwd: string | null = null): Promise<void> {
     Logger.info(
       'Download and installation of version ' +
         WhiteBoardUtil.getPluginLatestVersion() +
         ' in progress'
     );
-    Backend.backend_call<[], boolean>('ota_update').then(() => {
+    Backend.backend_masked_call<[_sudoPwd: string | null], boolean>(
+      'ota_update',
+      [0],
+      _sudoPwd
+    ).then(() => {
       SteamClient.System.RestartPC();
     });
   }

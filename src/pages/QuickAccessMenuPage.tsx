@@ -4,6 +4,7 @@ import { ConfigurationBlock } from '../components/configuration/main';
 import { LogsBlock } from '../components/infologs/main';
 import { ContributeBlock } from '../components/others/contributeBlock';
 import { MenuBlock } from '../components/others/menuBlock';
+import { PluginBlock } from '../components/others/pluginBlock';
 import { WarningBlock } from '../components/others/warningBlock';
 import { SyncBlock } from '../components/sync/main';
 import { MenuEntry } from '../models/menuEntries';
@@ -21,8 +22,8 @@ export const QuickAccessMenuPage: FC = () => {
         </>
       )}
       {WhiteBoardUtil.getMenuEntry() == MenuEntry.LOGS && <LogsBlock />}
+      {WhiteBoardUtil.getMenuEntry() == MenuEntry.PLUGIN && <PluginBlock />}
       <ContributeBlock />
     </>
   );
-  //{WhiteBoardUtil.getMenuEntry() == MenuEntry.PLUGIN && <PluginBlock />}
 };

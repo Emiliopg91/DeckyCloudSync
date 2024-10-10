@@ -90,9 +90,9 @@ class Plugin:
         return Constants.remote_dir
     
 #Plugin update
-    async def ota_update(self):
+    async def ota_update(self, _sudoPwd=None):
         try:
-            return PluginUpdate.ota_update()
+            return PluginUpdate.ota_update(_sudoPwd)
         except Exception as e:
             decky.logger.error(e)
             return False
