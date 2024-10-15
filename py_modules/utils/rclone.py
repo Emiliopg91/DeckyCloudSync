@@ -10,8 +10,6 @@ from utils.constants import Constants
 
 
 class RCloneManager:
-    running_instance: Process | None =   None
-
     @staticmethod
     async def configure(backend_type:str):
         params=["--config", Constants.rclone_settings, "--log-file",
@@ -51,17 +49,19 @@ class RCloneManager:
                     decky.DECKY_PLUGIN_LOG, "--log-format", "none", "-v"])
 
         cmd = [Constants.rclone_bin, *args]
+        asyncio.create_task(RCloneManager.async_sync(cmd))
 
-        decky.logger.info(f"Running command: {subprocess.list2cmdline(cmd)}")
-        RCloneManager.running_instance = await create_subprocess_exec(*cmd)
         return True
     
-    def check_status() -> int:
-        if RCloneManager.running_instance is None or RCloneManager.running_instance.returncode is None:
-            return -1
-        
-        code = RCloneManager.running_instance.returncode
-        RCloneManager.running_instance = None
-        decky.logger.info(f"Result code: {code}")
-        return code
-            
+    @staticmethod
+    async def async_sync(cmd):
+            decky.logger.info(f"Running command: {subprocess.list2cmdline(cmd)}")
+            process = await create_subprocess_exec(*cmd)
+            await process.wait()
+            code = process.returncode
+            decky.logger.info(f"Result code: {code}")
+            decky.logger.debug(f"Emitting event")
+            await decky.emit("rcloneSyncEnded", code)
+
+
+    

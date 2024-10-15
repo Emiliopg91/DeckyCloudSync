@@ -1,3 +1,4 @@
+import { addEventListener, removeEventListener } from '@decky/api';
 import {
   EventBus,
   EventData,
@@ -13,12 +14,17 @@ import { WhiteBoardUtil } from './whiteboard';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare const appStore: any;
 
-export class SteamListeners {
+export class Listeners {
   private static unsubscribeGameEvents: (() => void) | undefined = undefined;
   private static unsubscribeNetworkEvents: (() => void) | undefined = undefined;
 
+  private static rcloneSyncCallback: (resultCode: number) => void = (resultCode: number) => {
+    Logger.debug('Received event for RClone Sync ending: ' + resultCode);
+    WhiteBoardUtil.setSyncExitCode(resultCode);
+  };
+
   public static bind(): void {
-    SteamListeners.unsubscribeGameEvents = EventBus.subscribe(
+    Listeners.unsubscribeGameEvents = EventBus.subscribe(
       EventType.GAME_LIFE,
       (event: EventData) => {
         const e = event as GameLifeEventData;
@@ -47,24 +53,25 @@ export class SteamListeners {
       }
     ).unsubscribe;
 
-    SteamListeners.unsubscribeNetworkEvents = EventBus.subscribe(
-      EventType.NETWORK,
-      (e: EventData) => {
-        const newVal = (e as NetworkEventData).isConnectedToInet();
-        if (WhiteBoardUtil.getIsConnected() != newVal) {
-          Logger.info('New connection state: ' + (newVal ? '' : 'dis') + 'connected');
-          WhiteBoardUtil.setIsConnected(newVal);
-        }
+    Listeners.unsubscribeNetworkEvents = EventBus.subscribe(EventType.NETWORK, (e: EventData) => {
+      const newVal = (e as NetworkEventData).isConnectedToInet();
+      if (WhiteBoardUtil.getIsConnected() != newVal) {
+        Logger.info('New connection state: ' + (newVal ? '' : 'dis') + 'connected');
+        WhiteBoardUtil.setIsConnected(newVal);
       }
-    ).unsubscribe;
+    }).unsubscribe;
+
+    addEventListener('rcloneSyncEnded', Listeners.rcloneSyncCallback);
   }
 
   public static unbind(): void {
-    if (SteamListeners.unsubscribeGameEvents) {
-      SteamListeners.unsubscribeGameEvents();
+    removeEventListener('rcloneSyncEnded', Listeners.rcloneSyncCallback);
+
+    if (Listeners.unsubscribeGameEvents) {
+      Listeners.unsubscribeGameEvents();
     }
-    if (SteamListeners.unsubscribeNetworkEvents) {
-      SteamListeners.unsubscribeNetworkEvents();
+    if (Listeners.unsubscribeNetworkEvents) {
+      Listeners.unsubscribeNetworkEvents();
     }
   }
 }

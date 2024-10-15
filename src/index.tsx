@@ -14,8 +14,8 @@ import { EnterSudoPasswordPage } from './pages/EnterSudoPasswordPage';
 import { QuickAccessMenuPage } from './pages/QuickAccessMenuPage';
 import { ViewLogsPage } from './pages/ViewLogsPage';
 import { Constants } from './utils/constants';
+import { Listeners } from './utils/listeners';
 import { PluginSettings } from './utils/pluginSettings';
-import { SteamListeners } from './utils/steamListeners';
 import { WhiteBoardUtil } from './utils/whiteboard';
 
 let pluginUpdateCheckTimer: NodeJS.Timeout | undefined;
@@ -41,9 +41,11 @@ const checkPluginLatestVersion = async (): Promise<void> => {
     Logger.info('Latest plugin version: ' + vers);
     if (vers != WhiteBoardUtil.getPluginLatestVersion() && Constants.PLUGIN_VERSION != vers) {
       Logger.info('New plugin update available!');
-      Toast.toast(Translator.translate('update.available'), 5000, () => {
-        Navigation.Navigate(Constants.PATH_SUDO_PASSWORD);
-      });
+      if (!Constants.PLUGIN_VERSION.endsWith('-dev')) {
+        Toast.toast(Translator.translate('update.available'), 5000, () => {
+          Navigation.Navigate(Constants.PATH_SUDO_PASSWORD);
+        });
+      }
       clearInterval(pluginUpdateCheckTimer);
       pluginUpdateCheckTimer = undefined;
     }
@@ -76,7 +78,7 @@ export default definePlugin(() => {
 
     PluginSettings.initialize();
     WhiteBoardUtil.setProvider(PluginSettings.settings.settings.remote.provider);
-    SteamListeners.bind();
+    Listeners.bind();
 
     routerHook.addRoute(Constants.PATH_PLUGIN_LOG, () => <ViewLogsPage forSync={false} />, {
       exact: true
@@ -97,12 +99,10 @@ export default definePlugin(() => {
       exact: true
     });
 
-    if (!Constants.PLUGIN_VERSION.endsWith('-dev')) {
-      sleep(5000).then(() => {
-        pluginUpdateCheckTimer = setInterval(checkPluginLatestVersion, 60 * 60 * 1000);
-        checkPluginLatestVersion();
-      });
-    }
+    sleep(5000).then(() => {
+      pluginUpdateCheckTimer = setInterval(checkPluginLatestVersion, 60 * 60 * 1000);
+      checkPluginLatestVersion();
+    });
   })();
 
   return {
@@ -115,7 +115,7 @@ export default definePlugin(() => {
     ),
     icon: <PluginIcon width={20} height={20} />,
     async onDismount(): Promise<void> {
-      SteamListeners.unbind();
+      Listeners.unbind();
 
       routerHook.removeRoute(Constants.PATH_PLUGIN_LOG);
       routerHook.removeRoute(Constants.PATH_SYNC_LOG);
