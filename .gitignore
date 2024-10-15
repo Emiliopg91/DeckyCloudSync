@@ -53,3 +53,4 @@ out
 .eslintcache
 
 backend/rclone.zip
+.vscode/deck-settings.json
