@@ -1,4 +1,4 @@
-import { ConfirmModal, showModal, sleep } from '@decky/ui';
+import { ConfirmModal, showModal } from '@decky/ui';
 import { Mutex } from 'async-mutex';
 import { Backend, Logger, Toast, Translator } from 'decky-plugin-framework';
 
@@ -59,10 +59,9 @@ export class BackendUtils {
     }
     return new Promise<boolean>((resolve) => {
       BackendUtils.SYNC_MUTEX.acquire().then(async (release) => {
-        let result = true;
-        Logger.info('=== STARTING SYNC ===');
-        WhiteBoardUtil.setSyncInProgress(true);
         if (WhiteBoardUtil.getIsConnected()) {
+          WhiteBoardUtil.setSyncInProgress(true);
+          Logger.info('=== STARTING SYNC ===');
           switch (mode) {
             case SyncMode.NORMAL:
               Toast.toast(Translator.translate('synchronizing.savedata'));
@@ -78,51 +77,46 @@ export class BackendUtils {
           try {
             await BackendUtils.fsSync(true);
 
-            await BackendUtils.rcloneSync(winner, mode);
-            let returnCode = -2;
-            do {
-              await sleep(200);
-              returnCode = await BackendUtils.checkStatus();
-            } while (returnCode < 0);
-
-            if (returnCode != 0) {
-              Toast.toast(Translator.translate('sync.failed'), 5000, () => {
-                NavigationUtil.openLogPage(true);
-              });
-              WhiteBoardUtil.setSyncInProgress(false);
-              Logger.info('=== FINISHING SYNC ===');
-              release();
-              resolve(false);
-              return;
-            }
-
-            await BackendUtils.fsSync(false);
-            result = true;
-            Toast.toast(
-              Translator.translate('sync.succesful', { time: (Date.now() - t0) / 1000 }),
-              2000,
-              () => {
-                NavigationUtil.openLogPage(true);
+            WhiteBoardUtil.setSyncExitCode(-1);
+            const uns = WhiteBoardUtil.subscribeSyncExitCode(async (returnCode: number) => {
+              if (returnCode > -1) {
+                uns();
+                let result = false;
+                if (returnCode != 0) {
+                  Toast.toast(Translator.translate('sync.failed'), 5000, () => {
+                    NavigationUtil.openLogPage(true);
+                  });
+                } else {
+                  await BackendUtils.fsSync(false);
+                  result = true;
+                  Toast.toast(
+                    Translator.translate('sync.succesful', { time: (Date.now() - t0) / 1000 }),
+                    2000,
+                    () => {
+                      NavigationUtil.openLogPage(true);
+                    }
+                  );
+                }
+                Logger.info('=== FINISHING SYNC ===');
+                WhiteBoardUtil.setSyncInProgress(false);
+                release();
+                resolve(result);
               }
-            );
+            });
+
+            await BackendUtils.rcloneSync(winner, mode);
           } catch (e) {
             Logger.error('Sync exception', e);
-            result = false;
             Toast.toast(Translator.translate('sync.failed'), 5000, () => {
               NavigationUtil.openLogPage(true);
             });
           }
         } else {
           Logger.info('No network connection. Stopping sync');
-          result = false;
           Toast.toast(Translator.translate('sync.failed'), 5000, () => {
             NavigationUtil.openLogPage(true);
           });
         }
-        Logger.info('=== FINISHING SYNC ===');
-        WhiteBoardUtil.setSyncInProgress(false);
-        release();
-        resolve(result);
       });
     });
   }
@@ -180,17 +174,17 @@ export class BackendUtils {
     });
   }
 
-  private static async checkStatus(): Promise<number> {
-    return Backend.backend_call<[], number>('check_status');
-  }
-
-  public static async otaUpdate(): Promise<void> {
+  public static async otaUpdate(_sudoPwd: string | null = null): Promise<void> {
     Logger.info(
       'Download and installation of version ' +
         WhiteBoardUtil.getPluginLatestVersion() +
         ' in progress'
     );
-    Backend.backend_call<[], boolean>('ota_update').then(() => {
+    Backend.backend_masked_call<[_sudoPwd: string | null], boolean>(
+      'ota_update',
+      [0],
+      _sudoPwd
+    ).then(() => {
       SteamClient.System.RestartPC();
     });
   }

@@ -125,7 +125,10 @@ class PluginConfig:
             PluginConfig.cfg_property_file.touch()
             dictionary = {
                 "log_level": "INFO",
-                "entries": {}
+                "entries": {},
+                "settings":{
+                    "remote":{}
+                }
             }
             json_object = json.dumps(dictionary, indent=4)
             with open(PluginConfig.cfg_property_file, "w") as outfile:

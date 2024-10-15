@@ -1,14 +1,11 @@
-import { ButtonItem, Field, PanelSection, PanelSectionRow } from '@decky/ui';
-import { Toast, Translator } from 'decky-plugin-framework';
-import { FC, useState } from 'react';
+import { ButtonItem, Field, Navigation, PanelSection, PanelSectionRow } from '@decky/ui';
+import { Translator } from 'decky-plugin-framework';
+import { FC } from 'react';
 
-import { BackendUtils } from '../../utils/backend';
 import { Constants } from '../../utils/constants';
 import { WhiteBoardUtil } from '../../utils/whiteboard';
 
 export const PluginBlock: FC = () => {
-  const [isPluginDoingThings, setIsPluginDoingThings] = useState(false);
-
   return (
     <PanelSection>
       <PanelSectionRow>
@@ -28,14 +25,7 @@ export const PluginBlock: FC = () => {
           <PanelSectionRow>
             <ButtonItem
               onClick={() => {
-                Toast.toast(
-                  Constants.PLUGIN_VERSION === WhiteBoardUtil.getPluginLatestVersion() &&
-                    Boolean(WhiteBoardUtil.getPluginLatestVersion())
-                    ? Translator.translate('reinstalling.plugin')
-                    : Translator.translate('updating.plugin')
-                );
-                setIsPluginDoingThings(true);
-                BackendUtils.otaUpdate();
+                Navigation.Navigate(Constants.PATH_SUDO_PASSWORD);
               }}
               style={{
                 width: '100%',
@@ -43,7 +33,6 @@ export const PluginBlock: FC = () => {
                 justifyContent: 'center',
                 alignItems: 'center'
               }}
-              disabled={isPluginDoingThings}
             >
               {Constants.PLUGIN_VERSION === WhiteBoardUtil.getPluginLatestVersion() &&
               Boolean(WhiteBoardUtil.getPluginLatestVersion())

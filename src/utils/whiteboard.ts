@@ -86,4 +86,16 @@ export class WhiteBoardUtil {
   public static setPluginLatestVersion(value: string): void {
     WhiteBoard.set('pluginLatestVersion', value);
   }
+
+  public static setSyncExitCode(value: number): void {
+    WhiteBoard.set('syncExitCode', value);
+  }
+
+  public static getSyncExitCode(): number {
+    return WhiteBoard.get<number>('syncExitCode') || -1;
+  }
+
+  public static subscribeSyncExitCode(callback: (value: number) => void): () => void {
+    return WhiteBoardUtil.subscribe('syncExitCode', callback);
+  }
 }

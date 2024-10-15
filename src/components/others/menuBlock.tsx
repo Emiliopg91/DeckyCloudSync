@@ -19,11 +19,11 @@ export const MenuBlock: FC = () => {
             {
               data: MenuEntry.LOGS,
               label: Translator.translate('menu.logs')
-            } /*,
+            },
             {
               data: MenuEntry.PLUGIN,
               label: Translator.translate('menu.plugin')
-            }*/
+            }
           ]}
           onChange={(newVal) => {
             WhiteBoardUtil.setMenuEntry(newVal.data);

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import { definePlugin, routerHook } from '@decky/api';
-import { sleep, staticClasses } from '@decky/ui';
+import { Navigation, sleep, staticClasses } from '@decky/ui';
 import { Framework, Logger, Toast, Translator } from 'decky-plugin-framework';
 
 import translations from '../assets/translations.i18n.json';
@@ -10,11 +10,12 @@ import { GlobalProvider } from './contexts/globalContext';
 import { ConfigureBackendPage } from './pages/ConfigureBackendPage';
 import { ConfigurePathPage } from './pages/ConfigurePathPage';
 import { ConfigurePathsPage } from './pages/ConfigurePathsPage';
+import { EnterSudoPasswordPage } from './pages/EnterSudoPasswordPage';
 import { QuickAccessMenuPage } from './pages/QuickAccessMenuPage';
 import { ViewLogsPage } from './pages/ViewLogsPage';
 import { Constants } from './utils/constants';
+import { Listeners } from './utils/listeners';
 import { PluginSettings } from './utils/pluginSettings';
-import { SteamListeners } from './utils/steamListeners';
 import { WhiteBoardUtil } from './utils/whiteboard';
 
 let pluginUpdateCheckTimer: NodeJS.Timeout | undefined;
@@ -40,12 +41,11 @@ const checkPluginLatestVersion = async (): Promise<void> => {
     Logger.info('Latest plugin version: ' + vers);
     if (vers != WhiteBoardUtil.getPluginLatestVersion() && Constants.PLUGIN_VERSION != vers) {
       Logger.info('New plugin update available!');
-      Toast.toast(
-        Translator.translate('update.available'),
-        5000 /*, () => {
-        BackendUtils.otaUpdate();
-      }*/
-      );
+      if (!Constants.PLUGIN_VERSION.endsWith('-dev')) {
+        Toast.toast(Translator.translate('update.available'), 5000, () => {
+          Navigation.Navigate(Constants.PATH_SUDO_PASSWORD);
+        });
+      }
       clearInterval(pluginUpdateCheckTimer);
       pluginUpdateCheckTimer = undefined;
     }
@@ -78,7 +78,7 @@ export default definePlugin(() => {
 
     PluginSettings.initialize();
     WhiteBoardUtil.setProvider(PluginSettings.settings.settings.remote.provider);
-    SteamListeners.bind();
+    Listeners.bind();
 
     routerHook.addRoute(Constants.PATH_PLUGIN_LOG, () => <ViewLogsPage forSync={false} />, {
       exact: true
@@ -95,13 +95,14 @@ export default definePlugin(() => {
     routerHook.addRoute(Constants.PATH_CONFIGURE_PROVIDER, () => <ConfigureBackendPage />, {
       exact: true
     });
+    routerHook.addRoute(Constants.PATH_SUDO_PASSWORD, () => <EnterSudoPasswordPage />, {
+      exact: true
+    });
 
-    if (!Constants.PLUGIN_VERSION.endsWith('-dev')) {
-      sleep(5000).then(() => {
-        pluginUpdateCheckTimer = setInterval(checkPluginLatestVersion, 60 * 60 * 1000);
-        checkPluginLatestVersion();
-      });
-    }
+    sleep(5000).then(() => {
+      pluginUpdateCheckTimer = setInterval(checkPluginLatestVersion, 60 * 60 * 1000);
+      checkPluginLatestVersion();
+    });
   })();
 
   return {
@@ -114,12 +115,13 @@ export default definePlugin(() => {
     ),
     icon: <PluginIcon width={20} height={20} />,
     async onDismount(): Promise<void> {
-      SteamListeners.unbind();
+      Listeners.unbind();
 
       routerHook.removeRoute(Constants.PATH_PLUGIN_LOG);
       routerHook.removeRoute(Constants.PATH_SYNC_LOG);
       routerHook.removeRoute(Constants.PATH_CONFIGURE_PROVIDER);
       routerHook.removeRoute(Constants.PATH_CONFIGURE_PATHS);
+      routerHook.removeRoute(Constants.PATH_SUDO_PASSWORD);
 
       await Framework.shutdown();
     }
