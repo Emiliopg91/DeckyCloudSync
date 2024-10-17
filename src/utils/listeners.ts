@@ -1,5 +1,5 @@
-import { addEventListener, removeEventListener } from '@decky/api';
 import {
+  Backend,
   EventBus,
   EventData,
   EventType,
@@ -17,11 +17,7 @@ declare const appStore: any;
 export class Listeners {
   private static unsubscribeGameEvents: (() => void) | undefined = undefined;
   private static unsubscribeNetworkEvents: (() => void) | undefined = undefined;
-
-  private static rcloneSyncCallback: (resultCode: number) => void = (resultCode: number) => {
-    Logger.debug('Received event for RClone Sync ending: ' + resultCode);
-    WhiteBoardUtil.setSyncExitCode(resultCode);
-  };
+  private static unsubscribeRcloneSyncEnd: (() => void) | undefined = undefined;
 
   public static bind(): void {
     Listeners.unsubscribeGameEvents = EventBus.subscribe(
@@ -61,12 +57,18 @@ export class Listeners {
       }
     }).unsubscribe;
 
-    addEventListener('rcloneSyncEnded', Listeners.rcloneSyncCallback);
+    Listeners.unsubscribeRcloneSyncEnd = Backend.backend_handle(
+      'rcloneSyncEnded',
+      (resultCode: number) => {
+        WhiteBoardUtil.setSyncExitCode(resultCode);
+      }
+    );
   }
 
   public static unbind(): void {
-    removeEventListener('rcloneSyncEnded', Listeners.rcloneSyncCallback);
-
+    if (Listeners.unsubscribeRcloneSyncEnd) {
+      Listeners.unsubscribeRcloneSyncEnd();
+    }
     if (Listeners.unsubscribeGameEvents) {
       Listeners.unsubscribeGameEvents();
     }

@@ -60,7 +60,6 @@ class RCloneManager:
             await process.wait()
             code = process.returncode
             decky.logger.info(f"Result code: {code}")
-            decky.logger.debug(f"Emitting event")
             await decky.emit("rcloneSyncEnded", code)
 
 
