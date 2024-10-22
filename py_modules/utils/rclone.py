@@ -49,19 +49,13 @@ class RCloneManager:
                     decky.DECKY_PLUGIN_LOG, "--log-format", "none", "-v"])
 
         cmd = [Constants.rclone_bin, *args]
-        asyncio.create_task(RCloneManager.async_sync(cmd))
+        decky.logger.info(f"Running command: {subprocess.list2cmdline(cmd)}")
+        process = await create_subprocess_exec(*cmd)
+        await process.wait()
+        code = process.returncode
+        decky.logger.info(f"Result code: {code}")
 
-        return True
-    
-    @staticmethod
-    async def async_sync(cmd):
-            decky.logger.info(f"Running command: {subprocess.list2cmdline(cmd)}")
-            process = await create_subprocess_exec(*cmd)
-            await process.wait()
-            code = process.returncode
-            decky.logger.info(f"Result code: {code}")
-            decky.logger.debug(f"Emitting event")
-            await decky.emit("rcloneSyncEnded", code)
+        return code
 
 
     

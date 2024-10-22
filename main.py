@@ -12,6 +12,7 @@ from utils.processes import Processes
 from utils.fs_sync import FsSync
 from utils.logs import LogManager
 from utils.constants import Constants
+from utils.sync_mngr import SyncManager
 
 class Plugin:
 
@@ -48,23 +49,15 @@ class Plugin:
 
     async def configure(self, backend_type:str):
         return await RCloneManager.configure(backend_type)
-
-    async def rclone_sync(self, winner: str, mode: int) :
-        return await RCloneManager.sync(winner,mode)
-    
-    async def check_status(self) -> int:
-        return RCloneManager.check_status()
     
 # FileSystem sync
 
-    async def fs_sync(self, local_to_remote:bool):
-        if(local_to_remote):
-            FsSync.copyToRemote()
-        else:
-            FsSync.copyFromRemote()
-
     async def copy_to_local(self, dir:str) -> int:
         return FsSync.copyFolderToLocal(dir)
+    
+# SyncManager
+    async def sync(self, winner:str, mode:int):
+        await SyncManager.synchronize(winner, mode)
         
 # Processes
 
