@@ -114,7 +114,7 @@ export default definePlugin(() => {
       </GlobalProvider>
     ),
     icon: <PluginIcon width={20} height={20} />,
-    async onDismount(): Promise<void> {
+    onDismount(): void {
       Listeners.unbind();
 
       routerHook.removeRoute(Constants.PATH_PLUGIN_LOG);
@@ -123,7 +123,7 @@ export default definePlugin(() => {
       routerHook.removeRoute(Constants.PATH_CONFIGURE_PATHS);
       routerHook.removeRoute(Constants.PATH_SUDO_PASSWORD);
 
-      await Framework.shutdown();
+      Framework.shutdown();
     }
   };
 });
