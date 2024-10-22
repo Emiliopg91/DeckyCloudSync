@@ -1,7 +1,7 @@
 {
   "name": "DeckyCloudSync",
-  "version": "1.0.8",
-  "description": "Decky plugin template",
+  "version": "1.0.9-dev",
+  "description": "Decky plugin te mplate",
   "type": "module",
   "scripts": {
     "format": "prettier --write ./src",
