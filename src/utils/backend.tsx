@@ -29,12 +29,8 @@ export class BackendUtils {
     return Backend.backend_call<[backend_type: string], number>('configure', backend_type);
   }
 
-  public static async rcloneSync(winner: Winner, mode: SyncMode): Promise<number> {
-    return Backend.backend_call<[winner: string, mode: number], number>(
-      'rclone_sync',
-      winner,
-      mode
-    );
+  public static async sync(winner: Winner, mode: SyncMode): Promise<number> {
+    return Backend.backend_call<[winner: string, mode: number], number>('sync', winner, mode);
   }
 
   public static async fsSync(localToRemote: boolean): Promise<void> {
@@ -61,7 +57,6 @@ export class BackendUtils {
       BackendUtils.SYNC_MUTEX.acquire().then(async (release) => {
         if (WhiteBoardUtil.getIsConnected()) {
           WhiteBoardUtil.setSyncInProgress(true);
-          Logger.info('=== STARTING SYNC ===');
           switch (mode) {
             case SyncMode.NORMAL:
               Toast.toast(Translator.translate('synchronizing.savedata'));
@@ -75,8 +70,6 @@ export class BackendUtils {
           }
           const t0 = Date.now();
           try {
-            await BackendUtils.fsSync(true);
-
             WhiteBoardUtil.setSyncExitCode(-1);
             const uns = WhiteBoardUtil.subscribeSyncExitCode(async (returnCode: number) => {
               if (returnCode > -1) {
@@ -87,7 +80,6 @@ export class BackendUtils {
                     NavigationUtil.openLogPage(true);
                   });
                 } else {
-                  await BackendUtils.fsSync(false);
                   result = true;
                   Toast.toast(
                     Translator.translate('sync.succesful', { time: (Date.now() - t0) / 1000 }),
@@ -97,14 +89,13 @@ export class BackendUtils {
                     }
                   );
                 }
-                Logger.info('=== FINISHING SYNC ===');
                 WhiteBoardUtil.setSyncInProgress(false);
                 release();
                 resolve(result);
               }
             });
 
-            await BackendUtils.rcloneSync(winner, mode);
+            await BackendUtils.sync(winner, mode);
           } catch (e) {
             Logger.error('Sync exception', e);
             Toast.toast(Translator.translate('sync.failed'), 5000, () => {

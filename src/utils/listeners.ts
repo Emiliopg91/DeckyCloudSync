@@ -58,7 +58,7 @@ export class Listeners {
     }).unsubscribe;
 
     Listeners.unsubscribeRcloneSyncEnd = Backend.backend_handle(
-      'rcloneSyncEnded',
+      'syncEnded',
       (resultCode: number) => {
         WhiteBoardUtil.setSyncExitCode(resultCode);
       }
