@@ -6,6 +6,7 @@ from plugin_logger import PluginLogger
 from utils.constants import Constants
 from utils.fs_sync import FsSync
 from utils.rclone import RCloneManager
+from plugin_websocket import PluginWebsocket
 
 import asyncio
 import decky
@@ -22,11 +23,14 @@ class SyncManager:
     @staticmethod
     async def _async_sync(winner: str, mode:str):
         PluginLogger.log("INFO", "=== STARTING SYNC ===")
+        await decky.emit("syncStarted")
+        await PluginWebsocket.publish_event("syncStarted")
         FsSync.copyToRemote()
 
         code = await RCloneManager.sync(winner, mode)
         if(code == 0):
             FsSync.copyFromRemote()
 
-        PluginLogger.log("INFO", '=== FINISHING SYNC ===')
         await decky.emit("syncEnded", code)
+        await PluginWebsocket.publish_event("syncEnded", code)
+        PluginLogger.log("INFO", '=== FINISHING SYNC ===')
