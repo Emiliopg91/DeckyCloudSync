@@ -57,42 +57,11 @@ export class BackendUtils {
       BackendUtils.SYNC_MUTEX.acquire().then(async (release) => {
         if (WhiteBoardUtil.getIsConnected()) {
           WhiteBoardUtil.setSyncInProgress(true);
-          switch (mode) {
-            case SyncMode.NORMAL:
-              Toast.toast(Translator.translate('synchronizing.savedata'));
-              break;
-            case SyncMode.RESYNC:
-              Toast.toast(Translator.translate('resynchronizing.savedata'));
-              break;
-            case SyncMode.FORCE:
-              Toast.toast(Translator.translate('forcing.sync'));
-              break;
-          }
-          const t0 = Date.now();
+
           try {
-            WhiteBoardUtil.setSyncExitCode(-1);
-            const uns = WhiteBoardUtil.subscribeSyncExitCode(async (returnCode: number) => {
-              if (returnCode > -1) {
-                uns();
-                let result = false;
-                if (returnCode != 0) {
-                  Toast.toast(Translator.translate('sync.failed'), 5000, () => {
-                    NavigationUtil.openLogPage(true);
-                  });
-                } else {
-                  result = true;
-                  Toast.toast(
-                    Translator.translate('sync.succesful', { time: (Date.now() - t0) / 1000 }),
-                    2000,
-                    () => {
-                      NavigationUtil.openLogPage(true);
-                    }
-                  );
-                }
-                WhiteBoardUtil.setSyncInProgress(false);
-                release();
-                resolve(result);
-              }
+            WhiteBoardUtil.setSyncRelease((result: boolean) => {
+              release();
+              resolve(result);
             });
 
             await BackendUtils.sync(winner, mode);

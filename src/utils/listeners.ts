@@ -5,10 +5,14 @@ import {
   EventType,
   GameLifeEventData,
   Logger,
-  NetworkEventData
+  NetworkEventData,
+  Toast,
+  Translator
 } from 'decky-plugin-framework';
 
+import { SyncMode } from '../models/syncModes';
 import { BackendUtils } from './backend';
+import { NavigationUtil } from './navigation';
 import { WhiteBoardUtil } from './whiteboard';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -17,7 +21,8 @@ declare const appStore: any;
 export class Listeners {
   private static unsubscribeGameEvents: (() => void) | undefined = undefined;
   private static unsubscribeNetworkEvents: (() => void) | undefined = undefined;
-  private static unsubscribeRcloneSyncEnd: (() => void) | undefined = undefined;
+  private static unsubscribeSyncEnd: (() => void) | undefined = undefined;
+  private static unsubscribeSyncStarted: (() => void) | undefined = undefined;
 
   public static bind(): void {
     Listeners.unsubscribeGameEvents = EventBus.subscribe(
@@ -57,17 +62,59 @@ export class Listeners {
       }
     }).unsubscribe;
 
-    Listeners.unsubscribeRcloneSyncEnd = Backend.backend_handle(
+    Listeners.unsubscribeSyncStarted = Backend.backend_handle('syncStarted', (mode: SyncMode) => {
+      switch (mode) {
+        case SyncMode.NORMAL:
+          Toast.toast(Translator.translate('synchronizing.savedata'));
+          break;
+        case SyncMode.RESYNC:
+          Toast.toast(Translator.translate('resynchronizing.savedata'));
+          break;
+        case SyncMode.FORCE:
+          Toast.toast(Translator.translate('forcing.sync'));
+          break;
+      }
+      WhiteBoardUtil.setSyncInProgress(true);
+    });
+
+    Listeners.unsubscribeSyncEnd = Backend.backend_handle(
       'syncEnded',
-      (resultCode: number) => {
-        WhiteBoardUtil.setSyncExitCode(resultCode);
+      (returnCode: number, elapsed: number) => {
+        WhiteBoardUtil.setSyncInProgress(false);
+
+        if (returnCode > -1) {
+          let result = false;
+          if (returnCode != 0) {
+            Toast.toast(Translator.translate('sync.failed'), 5000, () => {
+              NavigationUtil.openLogPage(true);
+            });
+          } else {
+            result = true;
+            Toast.toast(
+              Translator.translate('sync.succesful', { time: Math.round(elapsed) / 1000 }),
+              2000,
+              () => {
+                NavigationUtil.openLogPage(true);
+              }
+            );
+          }
+          WhiteBoardUtil.setSyncInProgress(false);
+          if (WhiteBoardUtil.getSyncRelease()) {
+            WhiteBoardUtil.getSyncRelease()!(result);
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            WhiteBoardUtil.setSyncRelease(() => {});
+          }
+        }
       }
     );
   }
 
   public static unbind(): void {
-    if (Listeners.unsubscribeRcloneSyncEnd) {
-      Listeners.unsubscribeRcloneSyncEnd();
+    if (Listeners.unsubscribeSyncStarted) {
+      Listeners.unsubscribeSyncStarted();
+    }
+    if (Listeners.unsubscribeSyncEnd) {
+      Listeners.unsubscribeSyncEnd();
     }
     if (Listeners.unsubscribeGameEvents) {
       Listeners.unsubscribeGameEvents();

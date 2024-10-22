@@ -10,8 +10,7 @@ from plugin_websocket import PluginWebsocket
 
 import asyncio
 import decky
-import os
-import subprocess
+import time
 
 class SyncManager:
 
@@ -23,14 +22,19 @@ class SyncManager:
     @staticmethod
     async def _async_sync(winner: str, mode:str):
         PluginLogger.log("INFO", "=== STARTING SYNC ===")
-        await decky.emit("syncStarted")
-        await PluginWebsocket.publish_event("syncStarted")
+
+        start_time = time.time()
+        await decky.emit("syncStarted", mode)
+        await PluginWebsocket.publish_event("syncStarted", mode)
         FsSync.copyToRemote()
 
         code = await RCloneManager.sync(winner, mode)
         if(code == 0):
             FsSync.copyFromRemote()
 
-        await decky.emit("syncEnded", code)
-        await PluginWebsocket.publish_event("syncEnded", code)
+        elapsed = (time.time() - start_time) * 1000
+
+        await decky.emit("syncEnded", code, elapsed)
+        await PluginWebsocket.publish_event("syncEnded", code, elapsed)
+
         PluginLogger.log("INFO", '=== FINISHING SYNC ===')

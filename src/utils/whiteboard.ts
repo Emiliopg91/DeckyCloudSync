@@ -87,15 +87,11 @@ export class WhiteBoardUtil {
     WhiteBoard.set('pluginLatestVersion', value);
   }
 
-  public static setSyncExitCode(value: number): void {
-    WhiteBoard.set('syncExitCode', value);
+  public static setSyncRelease(value: (result: boolean) => void): void {
+    WhiteBoard.set('syncRelease', value);
   }
 
-  public static getSyncExitCode(): number {
-    return WhiteBoard.get<number>('syncExitCode') || -1;
-  }
-
-  public static subscribeSyncExitCode(callback: (value: number) => void): () => void {
-    return WhiteBoardUtil.subscribe('syncExitCode', callback);
+  public static getSyncRelease(): ((result: boolean) => void) | undefined {
+    return WhiteBoard.get<(result: boolean) => void>('syncRelease') || undefined;
   }
 }
