@@ -17,6 +17,8 @@ import { WhiteBoardUtil } from './whiteboard';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare const appStore: any;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+declare const appDetailsStore: any;
 
 export class Listeners {
   private static unsubscribeGameEvents: (() => void) | undefined = undefined;
@@ -27,9 +29,10 @@ export class Listeners {
   public static bind(): void {
     Listeners.unsubscribeGameEvents = EventBus.subscribe(
       EventType.GAME_LIFE,
-      (event: EventData) => {
+      async (event: EventData) => {
         const e = event as GameLifeEventData;
         const gameInfo = appStore.GetAppOverviewByGameID(e.getGameId());
+        const gameDet = await appDetailsStore.GetAppDetails(e.getGameId());
         Logger.info(
           (e.isRunning() ? 'Starting' : 'Stopping') +
             " game '" +
@@ -40,12 +43,21 @@ export class Listeners {
         );
 
         let shouldSync = true;
-        if (gameInfo?.store_category.includes(23)) {
-          // 23 - Cloud Save
-          Logger.info('Steam game with Steam Cloud, skipping');
-          shouldSync = false;
+        if (gameInfo.app_type == 1) {
+          if (gameInfo?.store_category.includes(23)) {
+            if (gameDet.eCloudSync == 0) {
+              Logger.info('Steam game with Steam Cloud disabled, proceeding');
+              shouldSync = true;
+            } else {
+              Logger.info('Steam game with Steam Cloud enabled, skipping');
+              shouldSync = false;
+            }
+          } else {
+            Logger.info('Steam game without Steam Cloud, proceeding');
+            shouldSync = true;
+          }
         } else {
-          Logger.info('Non Steam game, or game without Steam Cloud, proceeding');
+          Logger.info('Non Steam game, proceeding');
           shouldSync = true;
         }
         if (shouldSync) {

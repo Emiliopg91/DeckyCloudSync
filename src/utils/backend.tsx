@@ -1,4 +1,4 @@
-import { ConfirmModal, showModal } from '@decky/ui';
+import { ConfirmModal, showModal, sleep } from '@decky/ui';
 import { Mutex } from 'async-mutex';
 import { Backend, Logger, Toast, Translator } from 'decky-plugin-framework';
 
@@ -81,9 +81,15 @@ export class BackendUtils {
     });
   }
 
-  public static async doSynchronizationForGame(onStart: boolean, pid: number): Promise<void> {
+  public static async doSynchronizationForGame(
+    onStart: boolean,
+    pid: number,
+    alreadyWaited: boolean = false
+  ): Promise<void> {
     if (onStart) {
-      await BackendUtils.sendSignal(pid, Signal.SIGSTOP);
+      if (!alreadyWaited) {
+        await BackendUtils.sendSignal(pid, Signal.SIGSTOP);
+      }
 
       if (WhiteBoardUtil.getIsConnected()) {
         await BackendUtils.doSynchronization(
@@ -93,20 +99,26 @@ export class BackendUtils {
 
         await BackendUtils.sendSignal(pid, Signal.SIGCONT);
       } else {
-        showModal(
-          <ConfirmModal
-            strTitle={Translator.translate('no.connection')}
-            strDescription={Translator.translate('no.connection.desc')}
-            strOKButtonText={Translator.translate('stop.app')}
-            strCancelButtonText={Translator.translate('run.anyway')}
-            onOK={async () => {
-              await BackendUtils.sendSignal(pid, Signal.SIGKILL);
-            }}
-            onCancel={async () => {
-              await BackendUtils.sendSignal(pid, Signal.SIGCONT);
-            }}
-          />
-        );
+        if (!alreadyWaited) {
+          Toast.toast(Translator.translate('waiting.for.connection'));
+          await sleep(5000);
+          await BackendUtils.doSynchronizationForGame(onStart, pid, true);
+        } else {
+          showModal(
+            <ConfirmModal
+              strTitle={Translator.translate('no.connection')}
+              strDescription={Translator.translate('no.connection.desc')}
+              strOKButtonText={Translator.translate('run.anyway')}
+              strCancelButtonText={Translator.translate('stop.app')}
+              onOK={async () => {
+                await BackendUtils.sendSignal(pid, Signal.SIGCONT);
+              }}
+              onCancel={async () => {
+                await BackendUtils.sendSignal(pid, Signal.SIGKILL);
+              }}
+            />
+          );
+        }
       }
     } else {
       await BackendUtils.doSynchronization(onStart ? Winner.REMOTE : Winner.LOCAL, SyncMode.NORMAL);
