@@ -1,6 +1,6 @@
 {
   "name": "DeckyCloudSync",
-  "version": "1.0.9",
+  "version": "1.0.10-dev",
   "description": "Decky plugin te mplate",
   "type": "module",
   "scripts": {
@@ -40,7 +40,7 @@
     "@types/react": "18.3.3",
     "@types/react-dom": "18.3.0",
     "@types/webpack": "^5.28.5",
-    "decky-plugin-framework": "^1.4.7",
+    "decky-plugin-framework": "^1.4.8",
     "eslint": "8.57.1",
     "eslint-plugin-react": "^7.34.3",
     "prettier": "3.3.3",
@@ -57,8 +57,8 @@
   },
   "devRemoteBinaries": [
     {
-      "url": "https://downloads.rclone.org/v1.68.1/rclone-v1.68.1-linux-amd64.zip",
-      "sha256hash": "34f34743b1831523cd2e0aff74447b717e2d62fe1b598e91703899e0c0689568",
+      "url": "https://downloads.rclone.org/v1.69.3/rclone-v1.69.3-linux-amd64.zip",
+      "sha256hash": "14c841f24de6dfb5b914900b345b02e6a00278ad20e7502041d856a4f1d4e221",
       "name": "backend/rclone.zip"
     }
   ],
@@ -76,5 +76,6 @@
       "style": "module",
       "parser": "typescript"
     }
-  }
+  },
+  "packageManager": "pnpm@9.12.3+sha512.cce0f9de9c5a7c95bef944169cc5dfe8741abfb145078c0d508b868056848a87c81e626246cb60967cbd7fd29a6c062ef73ff840d96b3c86c40ac92cf4a813ee"
 }

@@ -1,4 +1,4 @@
-import { ConfirmModal, showModal } from '@decky/ui';
+import { ConfirmModal, showModal, sleep } from '@decky/ui';
 import { Mutex } from 'async-mutex';
 import { Backend, Logger, Toast, Translator } from 'decky-plugin-framework';
 
@@ -57,42 +57,11 @@ export class BackendUtils {
       BackendUtils.SYNC_MUTEX.acquire().then(async (release) => {
         if (WhiteBoardUtil.getIsConnected()) {
           WhiteBoardUtil.setSyncInProgress(true);
-          switch (mode) {
-            case SyncMode.NORMAL:
-              Toast.toast(Translator.translate('synchronizing.savedata'));
-              break;
-            case SyncMode.RESYNC:
-              Toast.toast(Translator.translate('resynchronizing.savedata'));
-              break;
-            case SyncMode.FORCE:
-              Toast.toast(Translator.translate('forcing.sync'));
-              break;
-          }
-          const t0 = Date.now();
+
           try {
-            WhiteBoardUtil.setSyncExitCode(-1);
-            const uns = WhiteBoardUtil.subscribeSyncExitCode(async (returnCode: number) => {
-              if (returnCode > -1) {
-                uns();
-                let result = false;
-                if (returnCode != 0) {
-                  Toast.toast(Translator.translate('sync.failed'), 5000, () => {
-                    NavigationUtil.openLogPage(true);
-                  });
-                } else {
-                  result = true;
-                  Toast.toast(
-                    Translator.translate('sync.succesful', { time: (Date.now() - t0) / 1000 }),
-                    2000,
-                    () => {
-                      NavigationUtil.openLogPage(true);
-                    }
-                  );
-                }
-                WhiteBoardUtil.setSyncInProgress(false);
-                release();
-                resolve(result);
-              }
+            WhiteBoardUtil.setSyncRelease((result: boolean) => {
+              release();
+              resolve(result);
             });
 
             await BackendUtils.sync(winner, mode);
@@ -112,9 +81,15 @@ export class BackendUtils {
     });
   }
 
-  public static async doSynchronizationForGame(onStart: boolean, pid: number): Promise<void> {
+  public static async doSynchronizationForGame(
+    onStart: boolean,
+    pid: number,
+    alreadyWaited: boolean = false
+  ): Promise<void> {
     if (onStart) {
-      await BackendUtils.sendSignal(pid, Signal.SIGSTOP);
+      if (!alreadyWaited) {
+        await BackendUtils.sendSignal(pid, Signal.SIGSTOP);
+      }
 
       if (WhiteBoardUtil.getIsConnected()) {
         await BackendUtils.doSynchronization(
@@ -124,20 +99,26 @@ export class BackendUtils {
 
         await BackendUtils.sendSignal(pid, Signal.SIGCONT);
       } else {
-        showModal(
-          <ConfirmModal
-            strTitle={Translator.translate('no.connection')}
-            strDescription={Translator.translate('no.connection.desc')}
-            strOKButtonText={Translator.translate('stop.app')}
-            strCancelButtonText={Translator.translate('run.anyway')}
-            onOK={async () => {
-              await BackendUtils.sendSignal(pid, Signal.SIGKILL);
-            }}
-            onCancel={async () => {
-              await BackendUtils.sendSignal(pid, Signal.SIGCONT);
-            }}
-          />
-        );
+        if (!alreadyWaited) {
+          Toast.toast(Translator.translate('waiting.for.connection'));
+          await sleep(5000);
+          await BackendUtils.doSynchronizationForGame(onStart, pid, true);
+        } else {
+          showModal(
+            <ConfirmModal
+              strTitle={Translator.translate('no.connection')}
+              strDescription={Translator.translate('no.connection.desc')}
+              strOKButtonText={Translator.translate('run.anyway')}
+              strCancelButtonText={Translator.translate('stop.app')}
+              onOK={async () => {
+                await BackendUtils.sendSignal(pid, Signal.SIGCONT);
+              }}
+              onCancel={async () => {
+                await BackendUtils.sendSignal(pid, Signal.SIGKILL);
+              }}
+            />
+          );
+        }
       }
     } else {
       await BackendUtils.doSynchronization(onStart ? Winner.REMOTE : Winner.LOCAL, SyncMode.NORMAL);

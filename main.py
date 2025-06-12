@@ -12,6 +12,7 @@ from utils.processes import Processes
 from utils.fs_sync import FsSync
 from utils.logs import LogManager
 from utils.constants import Constants
+from plugin_websocket import PluginWebsocket
 from utils.sync_mngr import SyncManager
 
 class Plugin:
@@ -21,9 +22,11 @@ class Plugin:
     async def _main(self):
         PluginLogger.configure_logger()
         decky.logger.info("Running "+decky.DECKY_PLUGIN_NAME)
+        await PluginWebsocket.initialize(self)
 
     async def _unload(self):
         decky.logger.info("Unloading "+decky.DECKY_PLUGIN_NAME)
+        await PluginWebsocket.stop()
 
     async def _migration(self):
         decky.logger.info("Migrating plugin configuration")

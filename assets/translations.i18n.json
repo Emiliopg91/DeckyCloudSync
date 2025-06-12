@@ -294,5 +294,21 @@
   "error.copying.files": {
     "en": "Error copying files",
     "es": "Error copiando archivos"
+  },
+  "sudo.password.required": {
+    "en": "Sudo password required",
+    "es": "Se necesita contraseña de administrador"
+  },
+  "sudo.password.required.desc": {
+    "en": "To ensure your security, this plugin does not have administrator permissions. However, to perform the update, these permissions are required.",
+    "es": "Para garantizar tu seguridad, este plugin no tiene permisos de administrador. Sin embargo para realizar la actualización, estos permisos son requeridos."
+  },
+  "enter": {
+    "en": "Enter",
+    "es": "Introducir"
+  },
+  "waiting.for.connection": {
+    "en": "Waiting for active network connection",
+    "es": "Esperando conexión de red activa"
   }
 }

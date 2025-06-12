@@ -6,6 +6,7 @@ import time
 import decky
 from utils.constants import Constants
 
+
 class FsSync:
     # Function to find files matching a pattern
     def find_files(base_path, pattern):
@@ -19,7 +20,7 @@ class FsSync:
 
     # Function to read the JSON configuration file
     def read_json(file_path):
-        with open(file_path, 'r') as f:
+        with open(file_path, "r") as f:
             return json.load(f)
 
     # Function to get the modification time of a file
@@ -40,8 +41,12 @@ class FsSync:
 
     def should_delete_file(relative_path, inclusions, exclusions):
         """Check if a file should be deleted based on inclusions and exclusions."""
-        included = any(fnmatch.fnmatch(relative_path, pattern) for pattern in inclusions)
-        excluded = any(fnmatch.fnmatch(os.path.basename(relative_path), pattern) for pattern in exclusions)
+        included = any(
+            fnmatch.fnmatch(relative_path, pattern) for pattern in inclusions
+        )
+        excluded = any(
+            fnmatch.fnmatch(relative_path, pattern) for pattern in exclusions
+        )
         return included and not excluded
 
     def process_entry(entry_name, inclusions, exclusions, dest_folder, src_folder):
@@ -51,7 +56,7 @@ class FsSync:
         deleted_files = 0
         total_size = 0  # Variable to accumulate the total size of copied files
         log_entries = []
-        
+
         decky.logger.info(f"  Processing {entry_name}")
 
         # Process inclusions
@@ -61,7 +66,11 @@ class FsSync:
             files_to_copy.update(matched_files)
 
         # Filter files to copy, excluding the necessary ones
-        files_to_copy = {file for file in files_to_copy if os.path.basename(file) not in exclusions}
+        files_to_copy = {
+            file
+            for file in files_to_copy
+            if file.replace(src_folder + "/", "") not in exclusions
+        }
 
         # Create the destination directory if it does not exist
         os.makedirs(dest_folder, exist_ok=True)
@@ -73,7 +82,9 @@ class FsSync:
                 relative_path = FsSync.get_relative_path(dest_file, dest_folder)
                 src_file = os.path.join(src_folder, relative_path)
 
-                if not os.path.exists(src_file) and FsSync.should_delete_file(relative_path, inclusions, exclusions):
+                if not os.path.exists(src_file) and FsSync.should_delete_file(
+                    relative_path, inclusions, exclusions
+                ):
                     os.remove(dest_file)
                     deleted_files += 1
                     log_entries.append((relative_path, "(-)"))
@@ -86,7 +97,10 @@ class FsSync:
                 if not os.path.isdir(src_dir):
                     # We check if any files in the directory match the inclusion criteria before deleting the directory
                     for inclusion_pattern in inclusions:
-                        if any(fnmatch.fnmatch(file, inclusion_pattern) for file in os.listdir(dest_dir)):
+                        if any(
+                            fnmatch.fnmatch(file, inclusion_pattern)
+                            for file in os.listdir(dest_dir)
+                        ):
                             shutil.rmtree(dest_dir)
                             break
 
@@ -96,16 +110,22 @@ class FsSync:
             dest_file = os.path.join(dest_folder, relative_path)
 
             if os.path.exists(dest_file):
-                if FsSync.get_modification_time(file) > FsSync.get_modification_time(dest_file):
+                if FsSync.get_modification_time(file) > FsSync.get_modification_time(
+                    dest_file
+                ):
                     FsSync.copy_with_timestamps(file, dest_file)
                     modified_files += 1
-                    total_size += FsSync.get_file_size(file)  # Count size only if the file is modified
+                    total_size += FsSync.get_file_size(
+                        file
+                    )  # Count size only if the file is modified
                     log_entries.append((relative_path, "(m)"))
             else:
                 os.makedirs(os.path.dirname(dest_file), exist_ok=True)
                 FsSync.copy_with_timestamps(file, dest_file)
                 created_files += 1
-                total_size += FsSync.get_file_size(file)  # Count size only if the file is created
+                total_size += FsSync.get_file_size(
+                    file
+                )  # Count size only if the file is created
                 log_entries.append((relative_path, "(+)"))
 
         # Sort log entries alphabetically by relative path, ignoring case
@@ -155,10 +175,16 @@ class FsSync:
 
         # Process each entry in the JSON
         for entry_name, details in sorted(data.items()):
-            folder_path = details['folder']
-            inclusions = details.get('inclusions', ['*'])
-            exclusions = set(details.get('exclusions', []))
-            c, m, d, size = FsSync.process_entry(entry_name, inclusions, exclusions, Constants.remote_dir + "/" + entry_name, folder_path)
+            folder_path = details["folder"]
+            inclusions = details.get("inclusions", ["*"])
+            exclusions = set(details.get("exclusions", []))
+            c, m, d, size = FsSync.process_entry(
+                entry_name,
+                inclusions,
+                exclusions,
+                Constants.remote_dir + "/" + entry_name,
+                folder_path,
+            )
             created_files += c
             modified_files += m
             deleted_files += d
@@ -166,15 +192,19 @@ class FsSync:
 
         end_time = time.time()  # Record end time
         elapsed_time = end_time - start_time  # Calculate elapsed time
-        display_time = round(elapsed_time*1000)/1000
+        display_time = round(elapsed_time * 1000) / 1000
 
         # Calculate speed
         speed = total_size / elapsed_time if elapsed_time > 0 else 0
 
         # decky.logger.info summary in a single line
         decky.logger.info("")
-        decky.logger.info(f"Created: {created_files}, Modified: {modified_files}, Deleted: {deleted_files}")
-        decky.logger.info(f"Copied: {FsSync.format_size(total_size)} in {display_time} seconds ({FsSync.format_speed(speed)})")
+        decky.logger.info(
+            f"Created: {created_files}, Modified: {modified_files}, Deleted: {deleted_files}"
+        )
+        decky.logger.info(
+            f"Copied: {FsSync.format_size(total_size)} in {display_time} seconds ({FsSync.format_speed(speed)})"
+        )
         decky.logger.info("")
 
     def copyFromRemote():
@@ -190,13 +220,19 @@ class FsSync:
 
         # Read the JSON configuration file
         data = FsSync.read_json(Constants.plugin_settings)["entries"]
-        
+
         # Process each entry in the JSON
         for entry_name, details in sorted(data.items()):
-            folder_path = details['folder']
-            inclusions = details.get('inclusions', ['*'])
-            exclusions = set(details.get('exclusions', []))
-            c, m, d, size = FsSync.process_entry(entry_name, inclusions, exclusions, folder_path, Constants.remote_dir + "/" + entry_name)
+            folder_path = details["folder"]
+            inclusions = details.get("inclusions", ["*"])
+            exclusions = set(details.get("exclusions", []))
+            c, m, d, size = FsSync.process_entry(
+                entry_name,
+                inclusions,
+                exclusions,
+                folder_path,
+                Constants.remote_dir + "/" + entry_name,
+            )
             created_files += c
             modified_files += m
             deleted_files += d
@@ -204,18 +240,22 @@ class FsSync:
 
         end_time = time.time()  # Record end time
         elapsed_time = end_time - start_time  # Calculate elapsed time
-        display_time = round(elapsed_time*1000)/1000
+        display_time = round(elapsed_time * 1000) / 1000
 
         # Calculate speed
         speed = total_size / elapsed_time if elapsed_time > 0 else 0
 
         # decky.logger.info summary in a single line
         decky.logger.info("")
-        decky.logger.info(f"Created: {created_files}, Modified: {modified_files}, Deleted: {deleted_files}")
-        decky.logger.info(f"Copied: {FsSync.format_size(total_size)} in {display_time} seconds ({FsSync.format_speed(speed)})")
+        decky.logger.info(
+            f"Created: {created_files}, Modified: {modified_files}, Deleted: {deleted_files}"
+        )
+        decky.logger.info(
+            f"Copied: {FsSync.format_size(total_size)} in {display_time} seconds ({FsSync.format_speed(speed)})"
+        )
         decky.logger.info("")
 
-    def simulate_for_entry(entry:dict):
+    def simulate_for_entry(entry: dict):
         # Process inclusions
         files_to_copy = set()
         for inclusion_pattern in entry["inclusions"]:
@@ -223,12 +263,15 @@ class FsSync:
             files_to_copy.update(matched_files)
 
         # Filter files to copy, excluding the necessary ones
-        files_to_copy = {file for file in files_to_copy if os.path.basename(file) not in entry["exclusions"]}
+        files_to_copy = {
+            file
+            for file in files_to_copy
+            if os.path.basename(file) not in entry["exclusions"]
+        }
 
         return files_to_copy
-    
 
-    def copyFolderToLocal(dir:str) -> int:
+    def copyFolderToLocal(dir: str) -> int:
         decky.logger.info("")
         decky.logger.info(f"Copying {dir} to local")
 
@@ -239,12 +282,12 @@ class FsSync:
 
         # Read the JSON configuration file
         data = FsSync.read_json(Constants.plugin_settings)["entries"]
-        
+
         # Process each entry in the JSON
         for entry_name, details in sorted(data.items()):
             if entry_name == dir:
                 src_path = Constants.remote_dir + "/" + entry_name
-                dst_path = details['folder']
+                dst_path = details["folder"]
                 decky.logger.info(f"  Destination folder: {dst_path}")
 
                 for root, dirs, files in os.walk(src_path):
@@ -258,21 +301,25 @@ class FsSync:
 
                     for file in files:
                         src_file = os.path.join(root, file)
-                        dest_file = os.path.join(dest_dir, file).replace("/./","/")
+                        dest_file = os.path.join(dest_dir, file).replace("/./", "/")
                         FsSync.copy_with_timestamps(src_file, dest_file)
                         copied_files += 1
                         total_size += os.path.getsize(dest_file)
-                        decky.logger.info(f"    Copied ./{os.path.relpath(src_file, src_path)}")
+                        decky.logger.info(
+                            f"    Copied ./{os.path.relpath(src_file, src_path)}"
+                        )
 
         end_time = time.time()  # Record end time
         elapsed_time = end_time - start_time  # Calculate elapsed time
-        display_time = round(elapsed_time*1000)/1000
+        display_time = round(elapsed_time * 1000) / 1000
 
         # Calculate speed
         speed = total_size / elapsed_time if elapsed_time > 0 else 0
 
         decky.logger.info("")
-        decky.logger.info(f"Copied {copied_files} files, {FsSync.format_size(total_size)} in {display_time} seconds ({FsSync.format_speed(speed)})")
+        decky.logger.info(
+            f"Copied {copied_files} files, {FsSync.format_size(total_size)} in {display_time} seconds ({FsSync.format_speed(speed)})"
+        )
         decky.logger.info("")
 
         return copied_files
