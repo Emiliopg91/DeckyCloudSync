@@ -1,6 +1,6 @@
 {
   "name": "DeckyCloudSync",
-  "version": "1.0.11",
+  "version": "1.0.12-dev",
   "description": "Decky plugin te mplate",
   "type": "module",
   "scripts": {
