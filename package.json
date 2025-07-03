@@ -1,6 +1,6 @@
 {
   "name": "DeckyCloudSync",
-  "version": "1.0.10-dev",
+  "version": "1.0.12-dev",
   "description": "Decky plugin te mplate",
   "type": "module",
   "scripts": {
@@ -57,8 +57,8 @@
   },
   "devRemoteBinaries": [
     {
-      "url": "https://downloads.rclone.org/v1.69.3/rclone-v1.69.3-linux-amd64.zip",
-      "sha256hash": "14c841f24de6dfb5b914900b345b02e6a00278ad20e7502041d856a4f1d4e221",
+      "url": "https://downloads.rclone.org/v1.70.2/rclone-v1.70.2-linux-amd64.zip",
+      "sha256hash": "7bfa813f426820d20436e48a4e0b9bf21977fcd513a48f2d28eede3136b4bacb",
       "name": "backend/rclone.zip"
     }
   ],

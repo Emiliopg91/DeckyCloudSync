@@ -48,7 +48,7 @@ jobs:
           python3 cli/decky.py build
 
       - name: Publish Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: DeckyCloudSync
           path: out/DeckyCloudSync.tar.gz
@@ -93,7 +93,7 @@ jobs:
       - run: mkdir /tmp/artifacts
 
       - name: download artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           path: /tmp/artifacts
 
