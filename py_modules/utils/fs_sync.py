@@ -1,44 +1,55 @@
+# pylint: disable=missing-module-docstring, line-too-long
+
 import json
 import os
 import shutil
 import fnmatch
 import time
-import decky
+
+import decky  # pylint: disable=import-error
 from utils.constants import Constants
 
 
 class FsSync:
-    # Function to find files matching a pattern
+
+    @staticmethod
     def find_files(base_path, pattern):
+        """Function to find files matching a pattern"""
         matches = []
-        for root, dirnames, filenames in os.walk(base_path):
+        for root, _, filenames in os.walk(base_path):
             for filename in filenames:
                 filepath = os.path.join(root, filename)
                 if fnmatch.fnmatch(filepath, pattern):
                     matches.append(filepath)
         return matches
 
-    # Function to read the JSON configuration file
+    @staticmethod
     def read_json(file_path):
+        """Function to read the JSON configuration file"""
         with open(file_path, "r") as f:
             return json.load(f)
 
-    # Function to get the modification time of a file
+    @staticmethod
     def get_modification_time(file_path):
+        """Function to get the modification time of a file"""
         return os.path.getmtime(file_path)
 
-    # Function to get the size of a file
+    @staticmethod
     def get_file_size(file_path):
+        """Function to get the size of a file"""
         return os.path.getsize(file_path)
 
-    # Function to get the relative path from a base path
+    @staticmethod
     def get_relative_path(file_path, base_path):
+        """Function to get the relative path from a base path"""
         return os.path.relpath(file_path, base_path)
 
-    # Function to copy a file and preserve its timestamps
+    @staticmethod
     def copy_with_timestamps(src_file, dest_file):
+        """Function to copy a file and preserve its timestamps"""
         shutil.copy2(src_file, dest_file)
 
+    @staticmethod
     def should_delete_file(relative_path, inclusions, exclusions):
         """Check if a file should be deleted based on inclusions and exclusions."""
         included = any(
@@ -49,7 +60,9 @@ class FsSync:
         )
         return included and not excluded
 
+    @staticmethod
     def process_entry(entry_name, inclusions, exclusions, dest_folder, src_folder):
+        """Process entry"""
         # Initialize counters and log
         created_files = 0
         modified_files = 0
@@ -95,7 +108,6 @@ class FsSync:
                 src_dir = os.path.join(src_folder, relative_path)
 
                 if not os.path.isdir(src_dir):
-                    # We check if any files in the directory match the inclusion criteria before deleting the directory
                     for inclusion_pattern in inclusions:
                         if any(
                             fnmatch.fnmatch(file, inclusion_pattern)
@@ -137,29 +149,31 @@ class FsSync:
 
         return created_files, modified_files, deleted_files, total_size
 
+    @staticmethod
     def format_size(size_bytes):
         """Format the size into the most appropriate unit: B, KB, MB, GB."""
         if size_bytes >= 1024**3:
             return f"{size_bytes / (1024**3):.2f} GB"
-        elif size_bytes >= 1024**2:
+        if size_bytes >= 1024**2:
             return f"{size_bytes / (1024**2):.2f} MB"
-        elif size_bytes >= 1024:
+        if size_bytes >= 1024:
             return f"{size_bytes / 1024:.2f} KB"
-        else:
-            return f"{size_bytes:.2f} B"
+        return f"{size_bytes:.2f} B"
 
+    @staticmethod
     def format_speed(speed_bytes_per_sec):
         """Format the speed into the most appropriate unit: B/s, KB/s, MB/s, GB/s."""
         if speed_bytes_per_sec >= 1024**3:
             return f"{speed_bytes_per_sec / (1024**3):.2f} GB/s"
-        elif speed_bytes_per_sec >= 1024**2:
+        if speed_bytes_per_sec >= 1024**2:
             return f"{speed_bytes_per_sec / (1024**2):.2f} MB/s"
-        elif speed_bytes_per_sec >= 1024:
+        if speed_bytes_per_sec >= 1024:
             return f"{speed_bytes_per_sec / 1024:.2f} KB/s"
-        else:
-            return f"{speed_bytes_per_sec:.2f} B/s"
+        return f"{speed_bytes_per_sec:.2f} B/s"
 
+    @staticmethod
     def copyToRemote():
+        """Copy entries to remote"""
         decky.logger.info("")
         decky.logger.info("Copying to remote")
 
@@ -207,7 +221,9 @@ class FsSync:
         )
         decky.logger.info("")
 
+    @staticmethod
     def copyFromRemote():
+        """Copy entries from remote"""
         decky.logger.info("")
         decky.logger.info("Copying to local")
 
@@ -255,7 +271,9 @@ class FsSync:
         )
         decky.logger.info("")
 
+    @staticmethod
     def simulate_for_entry(entry: dict):
+        """Perform dry run"""
         # Process inclusions
         files_to_copy = set()
         for inclusion_pattern in entry["inclusions"]:
@@ -271,9 +289,11 @@ class FsSync:
 
         return files_to_copy
 
-    def copyFolderToLocal(dir: str) -> int:
+    @staticmethod
+    def copyFolderToLocal(directory: str) -> int:
+        """Copy folder to local"""
         decky.logger.info("")
-        decky.logger.info(f"Copying {dir} to local")
+        decky.logger.info(f"Copying {directory} to local")
 
         copied_files = 0
         total_size = 0  # Variable to accumulate the total size of copied files
@@ -285,7 +305,7 @@ class FsSync:
 
         # Process each entry in the JSON
         for entry_name, details in sorted(data.items()):
-            if entry_name == dir:
+            if entry_name == directory:
                 src_path = Constants.remote_dir + "/" + entry_name
                 dst_path = details["folder"]
                 decky.logger.info(f"  Destination folder: {dst_path}")

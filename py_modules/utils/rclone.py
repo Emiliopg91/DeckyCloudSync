@@ -1,17 +1,23 @@
+# pylint: disable=missing-module-docstring, line-too-long, broad-exception-caught
+
 import subprocess
 import asyncio
-from asyncio.subprocess import create_subprocess_exec, Process
-import decky
-from plugin_config import PluginConfig
+from asyncio.subprocess import create_subprocess_exec
 import os
-import os.path
 from glob import glob
+
+import decky  # pylint: disable=import-error
+
+from plugin_config import PluginConfig
 from utils.constants import Constants
 
 
 class RCloneManager:
+    """Manager for rclone processes"""
+
     @staticmethod
     async def configure(backend_type: str):
+        """Configure rclone"""
         params = [
             "--config",
             Constants.rclone_settings,
@@ -36,6 +42,7 @@ class RCloneManager:
 
     @staticmethod
     async def sync(winner: str, mode: int):
+        """Perform sync"""
         decky.logger.info("Deleting lock files.")
         for hgx in glob(decky.HOME + "/.cache/rclone/bisync/*.lck"):
             os.remove(hgx)
@@ -51,15 +58,15 @@ class RCloneManager:
         ]
 
         if mode == 0:
-            """Normal mode"""
+            # Normal mode
             decky.logger.info("Performing standard sync")
             args.extend(["--conflict-resolve", winner])
         elif mode == 1:
-            """For resync mode"""
+            # For resync mode
             args.extend(["--resync-mode", winner, "--resync"])
             decky.logger.info("Performing resync")
         elif mode == 2:
-            """For force mode"""
+            # For force mode
             args.extend(["--conflict-resolve", winner])
             args.extend(["--force"])
             decky.logger.info("Performing forced sync")
