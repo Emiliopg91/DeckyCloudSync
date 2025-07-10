@@ -1,54 +1,74 @@
+# pylint: disable=missing-module-docstring, line-too-long, broad-exception-caught, too-few-public-methods , consider-using-with
+
 import os
 import stat
 import urllib.request
 import json
 import ssl
-import decky
 import subprocess
 import shutil
 from plugin_config import PluginConfig
 
+import decky  # pylint: disable=import-error
+
+
 class PluginUpdate:
-  @staticmethod 
-  def recursive_chmod(path, perms, sudoPwd):
-    if sudoPwd is not None and sudoPwd!="":
-      subprocess.run(['sudo', '-S', 'chmod', "-R", "777", path],
-                      input=sudoPwd.encode(), check=True)
-    else: 
-      for dirpath, dirnames, filenames in os.walk(path):
-        current_perms = os.stat(dirpath).st_mode
-        os.chmod(dirpath, current_perms | perms)
-        for filename in filenames:
-          os.chmod(os.path.join(dirpath, filename), current_perms | perms)
+    """Manage plugin updates"""
 
-  @staticmethod
-  def download_latest_build():
-    url = PluginConfig.get_git_data()["releasesUrl"]
-    decky.logger.info("Downloading plugin update")
-    gcontext = ssl.SSLContext()
+    @staticmethod
+    def recursive_chmod(path, perms, sudo_pwd):
+        """Peform recursive chmod"""
+        if sudo_pwd is not None and sudo_pwd != "":
+            subprocess.run(
+                ["sudo", "-S", "chmod", "-R", "777", path],
+                input=sudo_pwd.encode(),
+                check=True,
+            )
+        else:
+            for dirpath, _, filenames in os.walk(path):
+                current_perms = os.stat(dirpath).st_mode
+                os.chmod(dirpath, current_perms | perms)
+                for filename in filenames:
+                    os.chmod(os.path.join(dirpath, filename), current_perms | perms)
 
-    response = urllib.request.urlopen(url, context=gcontext)
-    json_data = json.load(response)
+    @staticmethod
+    def download_latest_build():
+        """Download latest version"""
+        url = PluginConfig.get_git_data()["releasesUrl"]
+        decky.logger.info("Downloading plugin update")
+        gcontext = ssl.SSLContext()
 
-    download_url = json_data.get("assets")[0].get("browser_download_url")
+        response = urllib.request.urlopen(url, context=gcontext)
+        json_data = json.load(response)
 
-    file_path = f'/tmp/{decky.DECKY_PLUGIN_NAME}.tar.gz'
+        download_url = json_data.get("assets")[0].get("browser_download_url")
 
-    with urllib.request.urlopen(download_url, context=gcontext) as response, open(file_path, 'wb') as output_file:
-      output_file.write(response.read())
-      output_file.close()
-    decky.logger.info("Downloaded!")
+        file_path = f"/tmp/{decky.DECKY_PLUGIN_NAME}.tar.gz"
 
-    return file_path
+        with urllib.request.urlopen(download_url, context=gcontext) as response, open(
+            file_path, "wb"
+        ) as output_file:
+            output_file.write(response.read())
+            output_file.close()
+        decky.logger.info("Downloaded!")
 
-  @staticmethod
-  def ota_update(sudoPwd):
-    downloaded_filepath = PluginUpdate.download_latest_build()
+        return file_path
 
-    if os.path.exists(downloaded_filepath):
-      PluginUpdate.recursive_chmod(f'{decky.DECKY_USER_HOME}/homebrew/plugins', stat.S_IWUSR, sudoPwd)
-      shutil.rmtree(decky.DECKY_PLUGIN_DIR)
-      shutil.unpack_archive(downloaded_filepath, f'{decky.DECKY_USER_HOME}/homebrew/plugins')
-      os.remove(downloaded_filepath)
+    @staticmethod
+    def ota_update(sudo_pwd):
+        """Perform OTA update"""
+        downloaded_filepath = PluginUpdate.download_latest_build()
 
-      return True
+        if os.path.exists(downloaded_filepath):
+            PluginUpdate.recursive_chmod(
+                f"{decky.DECKY_USER_HOME}/homebrew/plugins", stat.S_IWUSR, sudo_pwd
+            )
+            shutil.rmtree(decky.DECKY_PLUGIN_DIR)
+            shutil.unpack_archive(
+                downloaded_filepath, f"{decky.DECKY_USER_HOME}/homebrew/plugins"
+            )
+            os.remove(downloaded_filepath)
+
+            return True
+
+        return False
